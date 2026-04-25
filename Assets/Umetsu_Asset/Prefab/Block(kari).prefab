@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2509299402395232545}
   - component: {fileID: 776108201759068914}
   - component: {fileID: 5597214904144084862}
-  - component: {fileID: 3038278718016762188}
+  - component: {fileID: 1416961992290550916}
   - component: {fileID: 1277356130448939553}
   m_Layer: 0
   m_Name: Block(kari)
@@ -136,7 +136,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &3038278718016762188
+--- !u!114 &1416961992290550916
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -145,10 +145,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 3468364833027856995}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 540484cbba0886c4ea0898065a606140, type: 3}
+  m_Script: {fileID: 11500000, guid: b4a19e75e8888e8408ba2c4508cc7d87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fallSpead: -0.05
+  fallSpead: -1
 --- !u!50 &1277356130448939553
 Rigidbody2D:
   serializedVersion: 5
