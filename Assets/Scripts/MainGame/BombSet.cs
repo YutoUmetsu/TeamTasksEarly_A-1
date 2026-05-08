@@ -9,6 +9,8 @@ public class BombSet : MonoBehaviour
     [Header("クリック対象のリスト（2と3を入れる）")]
     public List<GameObject> targetItems = new List<GameObject>();
 
+    public MakeSwitch makeSwitch;//インスペクターで突っ込む
+
     void Update()
     {
         if (Input.GetMouseButtonDown(0))
@@ -44,15 +46,16 @@ public class BombSet : MonoBehaviour
 
     void PlaceItemFromStock(Vector3 position)
     {
-        // 先頭のアイテムを取得
         GameObject itemToPlace = stockItems[0];
-
-        // 設置
         Instantiate(itemToPlace, position, Quaternion.identity);
-
-        // リストから削除（これで次のアイテムが0番目になる）
         stockItems.RemoveAt(0);
 
-        Debug.Log($"設置完了！ 残りストック: {stockItems.Count}個");
+        // ここでカウントを増やす！
+        if (makeSwitch != null)
+        {
+            makeSwitch.BombCount++;
+        }
+
+        Debug.Log($"設置完了！ 残りストック: {stockItems.Count}個 / 設置済み: {makeSwitch.BombCount}");
     }
 }
