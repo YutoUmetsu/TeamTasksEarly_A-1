@@ -3,38 +3,53 @@ using System;
 using TMPro;
 using System.Collections.Generic; // 必須！
 
-[Serializable]
-
-
 public class Skilltree : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
-    //[Header("スキルデータ")]
+    [Header("スキルデータ")]
 
     public string SkillName;
-    public bool Unlokkedskill; //取得済みスキル
-    public bool Availobleskill = false;//取得可能スキル
+    public bool UnlokkedSkill; //取得済みスキル
+    public bool AvailobleSkill = false;//取得可能スキル
+
+    public int Cost = 1; //コスト追加
     public List<Skilltree> NextSkill;//次のスキル
+    [SerializeField] SkillTreeManager manager;
 
 
-    void Initializetree(Skilltree center) //中心のスキルのみ取得可能
+
+
+    //void Initializetree(Skilltree center) //中心のスキルのみ取得可能
+    //{
+    //    center.AvailobleSkill = true;  
+    //}
+
+    public void UnlockSkilltree(SkillTreeManager manager)
     {
-        center.Availobleskill = true;  
-    }
+        if (UnlokkedSkill) return; //すでに取得済み
 
-    public void UnlockSkilltree(Skilltree Tree)
-    {
-        if (!Tree.Availobleskill) return;
+        if (!AvailobleSkill) return;  //取得不可
 
-        Tree.Unlokkedskill = true;
-        Tree.Availobleskill = false;
+        if(manager.CostPoint < Cost) return; //ポイント不足
+
+        manager.CostPoint -= Cost; //ポイント消費
+
+        UnlokkedSkill = true;
+        AvailobleSkill = false;
 
         //次のスキル開放
-        foreach(var next in Tree.NextSkill)
+        foreach(var next in NextSkill)
         {
-            next.Availobleskill = true;
+            next.AvailobleSkill = true;
         }
+
+
+        manager.UpdatePointText(); //UI更新
+
+        Debug.Log(SkillName + " を取得");
+
+
     }
 
 
@@ -53,14 +68,3 @@ public class Skilltree : MonoBehaviour
     }
 }
 
-public class SkillTreeManager : MonoBehaviour
-{
-    public int CostPoint = 0;
-
-    public TMP_Text pointsText;
-
-    void Updeate()
-    {
-        pointsText.text = "ポイント:" + CostPoint;
-    }
-}
