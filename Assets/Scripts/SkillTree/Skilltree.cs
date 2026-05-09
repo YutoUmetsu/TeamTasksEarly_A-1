@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using TMPro;
 using System.Collections.Generic; // 必須！
+using UnityEngine.UI;
 
 public class Skilltree : MonoBehaviour
 {
@@ -17,7 +18,7 @@ public class Skilltree : MonoBehaviour
     public List<Skilltree> NextSkill;//次のスキル
     [SerializeField] SkillTreeManager manager;
 
-
+    Image ButtonImage;
 
 
     //void Initializetree(Skilltree center) //中心のスキルのみ取得可能
@@ -58,13 +59,24 @@ public class Skilltree : MonoBehaviour
 
     void Start()
     {
-        
+        ButtonImage = GetComponent<Image>();
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        if (!UnlokkedSkill&&!AvailobleSkill)
+        {
+            ButtonImage.color = new Color(0.4f, 0.4f, 0.4f);
+        }
+        if (UnlokkedSkill)//解放済みの色
+        {
+            ButtonImage.color = Color.yellow;
+        }
+        else if (AvailobleSkill)//開放可能
+        {
+            ButtonImage.color = Color.red;//new Color(1f, 0.9f, 0.2f);
+        }
     }
 }
 
