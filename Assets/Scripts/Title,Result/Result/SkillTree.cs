@@ -13,4 +13,9 @@ public class SkillTree : MonoBehaviour
     {
         
     }
+
+    public void OnClick()
+    {
+        Debug.Log("Skiltree");
+    }
 }
