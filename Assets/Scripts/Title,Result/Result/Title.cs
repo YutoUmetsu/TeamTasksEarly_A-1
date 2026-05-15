@@ -17,7 +17,7 @@ public class Title : MonoBehaviour
 
     public void OnClick()
     {
-        SceneManager.LoadScene("424 2026");
+        SceneManager.LoadScene("Title");
     }
 
 }

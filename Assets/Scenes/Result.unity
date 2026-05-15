@@ -267,6 +267,7 @@ GameObject:
   - component: {fileID: 1060053223}
   - component: {fileID: 1060053222}
   - component: {fileID: 1060053224}
+  - component: {fileID: 1060053225}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -313,6 +314,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56fbb5d68ddddf846984abc811be18b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkillTree
+--- !u!114 &1060053225
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1060053221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51a20b31670178346a0dd39ab6f24ad3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Title
 --- !u!1 &1079473104
 GameObject:
   m_ObjectHideFlags: 0
