@@ -19,6 +19,10 @@ public class BlockSpawn : MonoBehaviour
     public static BlockInfomation[,] blockInfo;
     public int stageRange = 5;
 
+    // BombSetをインスペクターから繋ぐ用 
+    [Header("BombSetオブジェクトをここに")]
+    public BombSet bombSet;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -30,6 +34,11 @@ public class BlockSpawn : MonoBehaviour
             for (int j = 0; j < stageRange; j++)
             {
                 GameObject go = Instantiate(Block);
+                // 生成したブロックをBombSetのターゲットに自動登録
+                if (bombSet != null)
+                {
+                    bombSet.RegisterTarget(go);
+                }
                 go.transform.position = new Vector2(spawnVec.x + i * blockSize, spawnVec.y - j * blockSize);
                 go.GetComponent<BlockFall>().blockSize = blockSize;
                 go.GetComponent<BlockFall>().myX = i;
@@ -55,28 +64,12 @@ public class BlockSpawn : MonoBehaviour
         {
             for (int j = stageRange - 1; j >= 0; j--)
             {
-                if (blockInfo[i, j].blocks==Blocks.deleted)
+                // まだオブジェクトが存在していて、かつdeletedの場合のみDestroyする
+                if (blockInfo[i, j].blockObj != null && blockInfo[i, j].blocks == Blocks.deleted)
                 {
-                    Destroy(blockInfo[i,j].blockObj);
-                    blockInfo[i, j].blockObj = null;
+                    Destroy(blockInfo[i, j].blockObj);
+                    //ここにあった blockInfo[i, j].blockObj = null; は削除
                 }
-             
-            }
-        }
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            // 1.マウス座標をワールド座標に変換
-            Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-
-            // 2. その位置に重なっている2Dコライダーを検知 (方向はVector2.zeroでOK)
-            RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
-
-            // 3. ヒットしたか判定
-            if (hit.collider != null)
-            {
-                GameObject target = hit.collider.gameObject;
-                blockInfo[target.GetComponent<BlockFall>().myX, target.GetComponent<BlockFall>().myY].blocks = Blocks.deleted;
             }
         }
     }
