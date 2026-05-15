@@ -1,61 +1,85 @@
 using UnityEngine;
+using System.Collections; // 時間差の処理（コルーチン）を使うために必要
+using UnityEngine.SceneManagement; // 画面を切り替える（シーン遷移）ために必要
 
 public class MakeSwitch : MonoBehaviour
 {
+    // 今までに置かれた爆弾の数を数えるカウンター
     public int BombCount { get; set; }
 
-    [Header("スイッチの見た目オブジェクトをここに")]
+    // ─── 修正：固定の数字をやめて、爆弾設置システム（BombSet）と連動させる ───
+    [Header("爆弾設置システム（BombSet）のオブジェクトをここに")]
+    [SerializeField] private BombSet bombSet;
+
+    [Header("スイッチの見た目オブジェクト（3Dモデルや画像、UIボタンなど）")]
     public GameObject bombGeneratorObj;
 
+    [Header("爆発が終わってからシーン遷移するまでの待ち時間(秒)")]
+    [SerializeField] private float transitionDelay = 2.0f;
+
+    [Header("移動先のシーン名")]
+    [SerializeField] private string nextSceneName = "ResultScene";
+
+    // ゲームが始まった瞬間に1回だけ実行される
     void Start()
     {
-        // 見た目だけを隠す（このスクリプト自体は動いたまま）
+        // 準備：最初はスイッチを隠しておく（透明にするだけで、裏では動いてる）
         if (bombGeneratorObj != null) bombGeneratorObj.SetActive(false);
     }
 
+    // ゲーム中、ずーっと高速でループ実行される（1秒間に何十回も）
     void Update()
     {
-        // 5個置かれたら見た目を表示
-        if (BombCount >= 5 && bombGeneratorObj != null && !bombGeneratorObj.activeSelf)
+        // ─── 修正：自動連動システム ───
+        if (bombSet != null)
         {
-            bombGeneratorObj.SetActive(true);
+            // スイッチ出現に必要な数を、BombSet側で決めた「最大設置数」と同じにする（最初は3）
+            int requiredCount = bombSet.maxPlaceableBombs;
+
+            // もし「置かれた数」が「今の最大設置数」に達していて、かつ「スイッチがまだ隠れている」なら
+            if (BombCount >= requiredCount && bombGeneratorObj != null && !bombGeneratorObj.activeSelf)
+            {
+                // 条件クリア！スイッチを画面に表示する
+                bombGeneratorObj.SetActive(true);
+            }
         }
     }
 
-    public void ExplodeNearestBomb()
+    // スイッチ（UIボタンなど）が押されたときに呼び出す処理（全爆破ボタン）
+    public void ExplodeAllBombs()
     {
-        // FindObjectsByType に修正した（警告対策）
+        // ステージ上にある「すべての爆弾」を、残さず探してリストにする
         Bomb[] allBombs = Object.FindObjectsByType<Bomb>(FindObjectsSortMode.None);
 
-        Bomb nearestBomb = null;
-        float minDistance = float.MaxValue;
-
-        // MakeSwitch.cs の中
+        // リストに入った爆弾を、端から順番に1個ずつ爆発させていく
         foreach (Bomb b in allBombs)
         {
-            // Vector3をVector2として扱う（Zを無視する）
-            Vector2 myPos = transform.position;
-            Vector2 bombPos = b.transform.position;
-
-            float distance = Vector2.Distance(myPos, bombPos);
-
-            if (distance < minDistance)
+            // 爆弾がちゃんと存在していれば、爆発スイッチを入れる
+            if (b != null)
             {
-                minDistance = distance;
-                nearestBomb = b;
+                b.Explode();
             }
         }
 
+        // 仕事は終わったので、スイッチの見た目をまた隠す
+        if (bombGeneratorObj != null) bombGeneratorObj.SetActive(false);
 
-        if (nearestBomb != null)
-        {
-            nearestBomb.Explode();
+        // カウンターをゼロにリセット（次のゲーム用）
+        BombCount = 0;
 
-            // 起爆したら「見た目」だけをまた隠す
-            if (bombGeneratorObj != null) bombGeneratorObj.SetActive(false);
+        // ─── 追加：爆破が終わったので、時間差で次の画面へ行くタイマーを起動！ ───
+        StartCoroutine(WaitAndChangeScene());
+    }
 
-            // カウントをリセット（また5個置いたら出したい場合）
-            BombCount = 0;
-        }
+    // ─── 追加：指定した秒数だけ待ってから画面を切り替える関数 ───
+    private IEnumerator WaitAndChangeScene()
+    {
+        // コインが飛び出したりする演出が終わるまで、指定した秒数（例: 2秒）だけ待つ
+        yield return new WaitForSeconds(transitionDelay);
+
+        Debug.Log($"{nextSceneName} へ画面を切り替えます！");
+
+        // 次のシーンへ遷移する
+        SceneManager.LoadScene(nextSceneName);
     }
 }
