@@ -8,6 +8,9 @@ public class Bomb : MonoBehaviour
     [Header("爆発演出の持続時間")]
     public float destroyDelay = 0.5f;
 
+    [Header("この爆弾がUIのストックに並ぶ時の画像")]
+    public Sprite uiSprite;
+
     void Start()
     {
         // ゲーム開始時は爆発判定を隠しておく

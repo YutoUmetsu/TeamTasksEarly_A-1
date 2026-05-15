@@ -1,17 +1,36 @@
-using UnityEngine; 
+using UnityEngine;
+using System.Collections.Generic;
 
 public class ExplosionHit : MonoBehaviour
 {
-    // トリガー判定（Is Triggerにチェックが入っている場合）
+    [Header("爆風で消し去りたいオブジェクトの名前リスト（プレファブ名）")]
+    public List<string> targetNames = new List<string>();
+
+    // 自分の爆風（コライダー）に、何か他のオブジェクトが触れた瞬間に動く
     void OnTriggerEnter2D(Collider2D other)
     {
-        // 当たった相手の親、または自分自身に Bomb スクリプトがついているか確認
-        Bomb otherBomb = other.GetComponentInParent<Bomb>();
+        // 当たった相手の名前を取得
+        string hitObjectName = other.gameObject.name;
 
-        if (otherBomb != null)
+        // リストに登録された名前を1つずつチェックする
+        foreach (string targetName in targetNames)
         {
-            // まだ爆発していない場合だけ起爆（無限ループ防止）
-            otherBomb.Explode();
+            // 名前が空っぽなら飛ばす
+            if (string.IsNullOrEmpty(targetName)) continue;
+
+            // ─── ここがポイント！ ───
+            // 当たった相手の名前が、登録した名前から始まっているかチェック
+            // これにより「Enemy」も「Enemy(Clone)」も両方捕まえることができます
+            if (hitObjectName.StartsWith(targetName))
+            {
+                Debug.Log($"爆風がヒット！ {hitObjectName} を消去します。");
+
+                // 巻き込まれたオブジェクトを削除する
+                Destroy(other.gameObject);
+
+                // 1つ合致したらこのオブジェクトに対するチェックは終了
+                break;
+            }
         }
     }
 }
