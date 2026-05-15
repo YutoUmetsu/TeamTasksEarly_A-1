@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class play : MonoBehaviour
 {
@@ -17,6 +18,7 @@ public class play : MonoBehaviour
     public void OnClick()
     {
         Debug.Log("PLAY!");
+        SceneManager.LoadScene("Main");
     }
 
 }

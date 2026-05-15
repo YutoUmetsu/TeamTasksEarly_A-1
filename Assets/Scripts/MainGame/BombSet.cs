@@ -117,4 +117,13 @@ public class BombSet : MonoBehaviour
 
         Debug.Log($"設置完了！ 累計設置: {totalPlacedCount}/{maxPlaceableBombs}個");
     }
+
+    // ─── 追加：生成されたブロックをターゲットリストに入れる関数 ───
+    public void RegisterTarget(GameObject target)
+    {
+        if (!targetItems.Contains(target))
+        {
+            targetItems.Add(target);
+        }
+    }
 }
