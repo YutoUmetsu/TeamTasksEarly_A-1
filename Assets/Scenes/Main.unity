@@ -1090,11 +1090,11 @@ PrefabInstance:
     - target: {fileID: 7798412970323934775, guid: f09a74cafabe77a4ebe10232045094f8, type: 3}
       propertyPath: 'stockItems.Array.data[3]'
       value: 
-      objectReference: {fileID: 7435417333485573945, guid: 77b5a6505d84bbe4e8cb3b6212a1e9b5, type: 3}
+      objectReference: {fileID: 5226698635314389401, guid: b9f9ff2fe3e22004aaeacf941f4d1a8b, type: 3}
     - target: {fileID: 7798412970323934775, guid: f09a74cafabe77a4ebe10232045094f8, type: 3}
       propertyPath: 'stockItems.Array.data[4]'
       value: 
-      objectReference: {fileID: 7435417333485573945, guid: 77b5a6505d84bbe4e8cb3b6212a1e9b5, type: 3}
+      objectReference: {fileID: 2140071974557913961, guid: cd9b77be4e68e12419c7119880dcd439, type: 3}
     - target: {fileID: 7798412970323934775, guid: f09a74cafabe77a4ebe10232045094f8, type: 3}
       propertyPath: 'targetItems.Array.data[0]'
       value: 

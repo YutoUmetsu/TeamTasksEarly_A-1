@@ -21,21 +21,37 @@ public class Bomb : MonoBehaviour
     }
 
     // スイッチから呼ばれる関数
+    // スイッチから呼ばれる関数
     public void Explode()
     {
         Debug.Log("ドカーン！起爆しました");
 
-        // 1. 爆発判定を有効化する
+       
+        // 爆発する前に、自分が乗っている親（ブロック）のスクリプトを取得
+        BlockFall parentBlock = GetComponentInParent<BlockFall>();
+
+        if (parentBlock != null)
+        {
+            // 親ブロックのデータを強制的に「deleted」にする
+            BlockSpawn.blockInfo[parentBlock.myX, parentBlock.myY].blocks = Blocks.deleted;
+            Debug.Log($"足元のブロック ({parentBlock.myX}, {parentBlock.myY}) を道連れにします！");
+        }
+      
+        // 足元をdeletedにした後、親子関係を解除して独立させる
+        transform.SetParent(null);
+
+
+        // 1. 爆発判定（周り用）を有効化する
         if (explosionAreaGroup != null)
         {
             explosionAreaGroup.SetActive(true);
         }
 
         // 2. 爆弾本体（見た目）を隠す処理
-        // もし「爆弾本体」が別オブジェクトなら、ここでSetActive(false)する
+        SpriteRenderer sprite = GetComponent<SpriteRenderer>();
+        if (sprite != null) sprite.enabled = false;
 
-        // 3. 少し待ってから爆弾ごと削除
-        // (判定が当たった直後に消えないように少し猶予を持たせる)
+        // 3. 少し待ってから爆弾（判定）を削除
         Destroy(gameObject, destroyDelay);
     }
 }

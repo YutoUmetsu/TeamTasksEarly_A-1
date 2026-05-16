@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5619723695000202099}
   - component: {fileID: 6871836906217936897}
+  - component: {fileID: 4591662454063003710}
   m_Layer: 0
   m_Name: kariCoin
   m_TagString: Untagged
@@ -91,3 +92,16 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &4591662454063003710
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3075023401187976702}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76f497f049de3be40987456d334641df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DestroyTimer
+  lifeTime: 0.5

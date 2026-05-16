@@ -94,20 +94,33 @@ public class BombSet : MonoBehaviour
 
             if (targetItems.Contains(clickedObj))
             {
-                PlaceItemFromStock(clickedObj.transform.position);
+                // すでに爆弾が置いてあるかチェックする
+                // クリックしたブロックの子オブジェクト（または自分自身）から Bomb スクリプトを探す
+                Bomb existingBomb = clickedObj.GetComponentInChildren<Bomb>();
+
+                if (existingBomb != null)
+                {
+                    Debug.Log("ここにはすでに爆弾が設置されています！");
+                    return; //すでに爆弾があれば、ここで処理を終了
+                }
+
+                // まだ爆弾がなければ、生成してブロックの子オブジェクトにする
+                PlaceItemFromStock(clickedObj);
             }
         }
     }
 
-    void PlaceItemFromStock(Vector3 position)
+    // 受け取り側もちゃんと GameObject になっているか確認
+    void PlaceItemFromStock(GameObject targetBlock)
     {
         GameObject itemToPlace = stockItems[0];
-        Instantiate(itemToPlace, position, Quaternion.identity);
+
+        // ブロックと同じ位置に、ブロックの子として生成
+        GameObject spawnedBomb = Instantiate(itemToPlace, targetBlock.transform.position, Quaternion.identity);
+        spawnedBomb.transform.SetParent(targetBlock.transform);
+
         stockItems.RemoveAt(0);
-
-        // ─── 修正：消費した時も、最新状態にUIをリフレッシュするだけ！ ───
         RefreshStockUI();
-
         totalPlacedCount++;
 
         if (makeSwitch != null)
@@ -115,7 +128,7 @@ public class BombSet : MonoBehaviour
             makeSwitch.BombCount++;
         }
 
-        Debug.Log($"設置完了！ 累計設置: {totalPlacedCount}/{maxPlaceableBombs}個");
+        Debug.Log($"設置完了！ {totalPlacedCount}/{maxPlaceableBombs}個");
     }
 
     // ─── 追加：生成されたブロックをターゲットリストに入れる関数 ───
