@@ -200,7 +200,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Bomb
   explosionAreaGroup: {fileID: 7253086726045042543}
-  destroyDelay: 0.5
+  destroyDelay: 0.3
   uiSprite: {fileID: -1044015532666706457, guid: 4fd7de34cc5c5e541bee15cb197eef81, type: 3}
 --- !u!1 &4462832081165577612
 GameObject:
