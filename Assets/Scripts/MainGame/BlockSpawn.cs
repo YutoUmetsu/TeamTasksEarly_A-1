@@ -2,7 +2,8 @@ using System.Data;
 using NUnit.Framework;
 using Unity.Android.Gradle;
 using UnityEngine;
-   public enum Blocks
+using UnityEngine.Rendering;
+public enum Blocks
     {
         none=0,
         nomalBlock=1,
@@ -41,8 +42,6 @@ public class BlockSpawn : MonoBehaviour
                 }
                 go.transform.position = new Vector2(spawnVec.x + i * blockSize, spawnVec.y - j * blockSize);
                 go.GetComponent<BlockFall>().blockSize = blockSize;
-                go.GetComponent<BlockFall>().myX = i;
-                go.GetComponent<BlockFall>().myY = j;
                 go.GetComponent<BlockFall>().spawnPoint = spawnPoint;
                 go.GetComponent<BlockFall>().blockSpawn = GetComponent<BlockSpawn>();
                 blockInfo[i,j] = new BlockInfomation();
@@ -60,18 +59,52 @@ public class BlockSpawn : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        for (int i = stageRange - 1; i >= 0; i--)
+        //for (int x = stageRange - 1; x >= 0; x--)
+        //{
+        //    for (int y = stageRange - 1; y >= 0; y--)
+        //    {
+        //        // まだオブジェクトが存在していて、かつdeletedの場合のみDestroyする
+        //        if (blockInfo[x, y].blockObj != null && blockInfo[x, y].blocks == Blocks.deleted)
+        //        {
+        //            Destroy(blockInfo[x, y].blockObj);
+        //            blockInfo[x, y].blockObj = null;
+        //            blockInfo[x,y].blocks= Blocks.none;
+        //            Fall(x, y);
+        //        }
+        //        else if (blockInfo[x, y].blocks == Blocks.none)
+        //        {
+        //            Fall(x, y);
+        //        }
+        //    }
+        //}
+
+        for (int x = 0; x < stageRange; x++)
         {
-            for (int j = stageRange - 1; j >= 0; j--)
+            for (int y = 0; y < stageRange; y++)
             {
                 // まだオブジェクトが存在していて、かつdeletedの場合のみDestroyする
-                if (blockInfo[i, j].blockObj != null && blockInfo[i, j].blocks == Blocks.deleted)
+                if (blockInfo[x, y].blockObj != null && blockInfo[x, y].blocks == Blocks.deleted)
                 {
-                    Destroy(blockInfo[i, j].blockObj);
-                    //ここにあった blockInfo[i, j].blockObj = null; は削除
+                    Destroy(blockInfo[x, y].blockObj);
+                    blockInfo[x, y].blockObj = null;
+                    blockInfo[x, y].blocks = Blocks.none;
+                }
+
+                if (blockInfo[x, y].blocks == Blocks.none)
+                {
+                    Fall(x, y);
                 }
             }
         }
+    }
+
+    void Fall(int x, int y)
+    {
+        if (y == 0) return;
+        //if (blockInfo[x, y - 1].blocks == Blocks.deleted) return;
+        blockInfo[x, y] = blockInfo[x, y - 1];
+        blockInfo[x, y - 1].blocks = Blocks.none;
+        blockInfo[x, y - 1].blockObj = null;
     }
 }
 

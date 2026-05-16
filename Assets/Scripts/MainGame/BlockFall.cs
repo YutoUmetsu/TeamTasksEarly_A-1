@@ -19,6 +19,9 @@ public class BlockFall : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        Fall();
+
         if (transform.position.y > fallpoint.y + (myY * blockSize))
         {
             transform.position += new Vector3(0, fallSpead);
@@ -27,5 +30,21 @@ public class BlockFall : MonoBehaviour
         {
             transform.position = new Vector2(transform.position.x, fallpoint.y + (myY * blockSize));
         }
+    }
+
+    void Fall()
+    { 
+        for (int x= 0; x < blockSpawn.stageRange; x++)
+        {
+            for (int y = 0; y < blockSpawn.stageRange; y++)
+            {
+                if (gameObject == BlockSpawn.blockInfo[x, y].blockObj)
+                {
+                   myX = BlockSpawn.blockInfo[x, y].posX;
+                   myY = BlockSpawn.blockInfo[x, y].posY;
+                }
+            }
+        }
+
     }
 }

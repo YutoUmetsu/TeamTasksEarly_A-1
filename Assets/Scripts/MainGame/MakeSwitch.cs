@@ -68,7 +68,7 @@ public class MakeSwitch : MonoBehaviour
         BombCount = 0;
 
         // ─── 追加：爆破が終わったので、時間差で次の画面へ行くタイマーを起動！ ───
-        StartCoroutine(WaitAndChangeScene());
+        //StartCoroutine(WaitAndChangeScene());
     }
 
     // ─── 追加：指定した秒数だけ待ってから画面を切り替える関数 ───
