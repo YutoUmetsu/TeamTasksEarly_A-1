@@ -13,45 +13,54 @@ public class Bomb : MonoBehaviour
 
     void Start()
     {
-        // ゲーム開始時は爆発判定を隠しておく
         if (explosionAreaGroup != null)
         {
             explosionAreaGroup.SetActive(false);
         }
     }
 
-    // スイッチから呼ばれる関数
-    // スイッチから呼ばれる関数
     public void Explode()
     {
         Debug.Log("ドカーン！起爆しました");
 
-       
-        // 爆発する前に、自分が乗っている親（ブロック）のスクリプトを取得
-        BlockFall parentBlock = GetComponentInParent<BlockFall>();
+        Controller controller = UnityEngine.Object.FindFirstObjectByType<Controller>();
+        FallObject parentFallObj = GetComponentInParent<FallObject>();
 
-        if (parentBlock != null)
+        if (parentFallObj != null)
         {
-            // 親ブロックのデータを強制的に「deleted」にする
-            BlockSpawn.blockInfo[parentBlock.myX, parentBlock.myY].blocks = Blocks.deleted;
-            Debug.Log($"足元のブロック ({parentBlock.myX}, {parentBlock.myY}) を道連れにします！");
+            parentFallObj.SetDelete();
         }
-      
-        // 足元をdeletedにした後、親子関係を解除して独立させる
+
+        if (controller != null)
+        {
+            controller.TriggerExplosionFall();
+        }
+
         transform.SetParent(null);
 
-
-        // 1. 爆発判定（周り用）を有効化する
         if (explosionAreaGroup != null)
         {
             explosionAreaGroup.SetActive(true);
+            StartCoroutine(DisableCollidersDelayed());
         }
 
-        // 2. 爆弾本体（見た目）を隠す処理
         SpriteRenderer sprite = GetComponent<SpriteRenderer>();
         if (sprite != null) sprite.enabled = false;
 
-        // 3. 少し待ってから爆弾（判定）を削除
         Destroy(gameObject, destroyDelay);
+    }
+
+    // ほんの一瞬だけ判定を維持してオフに
+    private System.Collections.IEnumerator DisableCollidersDelayed()
+    {
+        yield return new WaitForSeconds(0.05f); // 0.05秒だけ待つ（落ちてくるよりは圧倒的に早い）
+        if (explosionAreaGroup != null)
+        {
+            Collider2D[] explosionColliders = explosionAreaGroup.GetComponentsInChildren<Collider2D>();
+            foreach (Collider2D col in explosionColliders)
+            {
+                if (col != null) col.enabled = false;
+            }
+        }
     }
 }

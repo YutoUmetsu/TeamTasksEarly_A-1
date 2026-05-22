@@ -20,10 +20,14 @@ public class MakeSwitch : MonoBehaviour
     [Header("移動先のシーン名")]
     [SerializeField] private string nextSceneName = "ResultScene";
 
-    // ゲームが始まった瞬間に1回だけ実行される
     void Start()
     {
-        // 準備：最初はスイッチを隠しておく（透明にするだけで、裏では動いてる）
+        // もしインスペクターで登録し忘れていたら、自動で画面内から探してくる
+        if (bombSet == null)
+        {
+            bombSet = UnityEngine.Object.FindFirstObjectByType<BombSet>();
+        }
+
         if (bombGeneratorObj != null) bombGeneratorObj.SetActive(false);
     }
 
@@ -54,7 +58,6 @@ public class MakeSwitch : MonoBehaviour
         // リストに入った爆弾を、端から順番に1個ずつ爆発させていく
         foreach (Bomb b in allBombs)
         {
-            // 爆弾がちゃんと存在していれば、爆発スイッチを入れる
             if (b != null)
             {
                 b.Explode();
@@ -64,22 +67,34 @@ public class MakeSwitch : MonoBehaviour
         // 仕事は終わったので、スイッチの見た目をまた隠す
         if (bombGeneratorObj != null) bombGeneratorObj.SetActive(false);
 
-        // カウンターをゼロにリセット（次のゲーム用）
+        // カウンターをゼロにリセット
         BombCount = 0;
 
-        // ─── 追加：爆破が終わったので、時間差で次の画面へ行くタイマーを起動！ ───
-        StartCoroutine(WaitAndChangeScene());
+        // 「落下の完了監視」コルーチンを起動
+        StartCoroutine(WaitForFallAndChangeScene());
     }
 
-    // ─── 追加：指定した秒数だけ待ってから画面を切り替える関数 ───
-    private IEnumerator WaitAndChangeScene()
+    //落下がすべて終わるのを監視してシーンを切り替える関数 
+    private IEnumerator WaitForFallAndChangeScene()
     {
-        // コインが飛び出したりする演出が終わるまで、指定した秒数（例: 2秒）だけ待つ
-        yield return new WaitForSeconds(transitionDelay);
+        Controller controller = Object.FindFirstObjectByType<Controller>();
 
-        Debug.Log($"{nextSceneName} へ画面を切り替えます！");
+        if (controller != null)
+        {
+            yield return new WaitForSeconds(0.1f);
 
-        // 次のシーンへ遷移する
+            //
+            while (!controller.IsInSelectState())
+            {
+                yield return null;
+            }
+        }
+        else
+        {
+            yield return new WaitForSeconds(transitionDelay);
+        }
+
+        yield return new WaitForSeconds(0.5f);
         SceneManager.LoadScene(nextSceneName);
     }
 }

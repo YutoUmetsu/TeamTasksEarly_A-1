@@ -16,22 +16,23 @@ public class ExplosionHit : MonoBehaviour
 
             if (hitObjectName.StartsWith(targetName))
             {
-                Debug.Log($"爆風がヒット！ {hitObjectName} の消滅処理を開始。");
-
-                // 直接 Destroy せず、BlockFall経由で管理データ(deleted)を書き換える
-                BlockFall blockFall = other.gameObject.GetComponent<BlockFall>();
-                if (blockFall != null)
+                FallObject fallObj = other.gameObject.GetComponent<FallObject>();
+                if (fallObj != null)
                 {
-                    // BlockSpawnの配列データを「deleted」に書き換える！
-                    // これにより、BlockSpawnのUpdate側で安全にDestroyされ、OnDestroyのコイン加算が走ります
-                    BlockSpawn.blockInfo[blockFall.myX, blockFall.myY].blocks = Blocks.deleted;
+                    //修正：爆風が当たった「その瞬間」に、その場で即座にコインを出す！
+                    Controller controller = UnityEngine.Object.FindFirstObjectByType<Controller>();
+                    if (controller != null)
+                    {
+                        controller.SpawnCoinImmediate(fallObj);
+                    }
+
+                    fallObj.SetDelete();
+                    Debug.Log($"爆風ヒット: {hitObjectName} を消去予定にしました。");
                 }
                 else
                 {
-                    // もしBlockFallがついていない別のターゲット（敵など）なら、今まで通り直接消す
                     Destroy(other.gameObject);
                 }
-
                 break;
             }
         }
