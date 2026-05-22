@@ -1218,13 +1218,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: spawnManager
       objectReference: {fileID: 0}
+    - target: {fileID: 4848836394877595218, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5605219780679848033, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -5
       objectReference: {fileID: 0}
     - target: {fileID: 5605219780679848033, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -3
       objectReference: {fileID: 0}
     - target: {fileID: 5605219780679848033, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1262,8 +1266,29 @@ PrefabInstance:
       propertyPath: bombSet
       value: 
       objectReference: {fileID: 1941640963}
+    - target: {fileID: 6226850868989169387, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6226850868989169387, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
+      propertyPath: spawnPoint
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983576289099948456, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
+      propertyPath: fallTime
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983576289099948456, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
+      propertyPath: boardSize
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983576289099948456, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
+      propertyPath: fallPrefab
+      value: 
+      objectReference: {fileID: 3468364833027856995, guid: dbaf3b5e54a75ed48924439df5043e96, type: 3}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 4848836394877595218, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
