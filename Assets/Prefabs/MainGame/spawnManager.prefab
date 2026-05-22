@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5605219780679848033}
   - component: {fileID: 6226850868989169387}
+  - component: {fileID: 8983576289099948456}
   m_Layer: 0
   m_Name: spawnManager
   m_TagString: Untagged
@@ -49,6 +50,22 @@ MonoBehaviour:
   spawnVec: {x: 0, y: 0}
   Block: {fileID: 3468364833027856995, guid: dbaf3b5e54a75ed48924439df5043e96, type: 3}
   stageRange: 7
+  bombSet: {fileID: 0}
+--- !u!114 &8983576289099948456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3315899685386054219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77db1ac63da003d4d939e67dda22df8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Controller
+  fallPrefab: {fileID: 0}
+  boardSize: 0
+  fallTime: 0
 --- !u!1 &4848836394877595218
 GameObject:
   m_ObjectHideFlags: 0
