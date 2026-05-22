@@ -73,18 +73,6 @@ public class BombSet : MonoBehaviour
 
     void CheckAndPlace()
     {
-        if (stockItems.Count <= 0)
-        {
-            Debug.Log("ストックが空です！");
-            return;
-        }
-
-        if (totalPlacedCount >= maxPlaceableBombs)
-        {
-            Debug.Log($"これ以上置けません！ 上限: {maxPlaceableBombs}個");
-            return;
-        }
-
         Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
 
@@ -92,20 +80,37 @@ public class BombSet : MonoBehaviour
         {
             GameObject clickedObj = hit.collider.gameObject;
 
+            // クリックしたものが、登録されているパズルブロックリストに含まれている場合
             if (targetItems.Contains(clickedObj))
             {
-                // すでに爆弾が置いてあるかチェックする
-                // クリックしたブロックの子オブジェクト（または自分自身）から Bomb スクリプトを探す
+                // すでに爆弾が置いてあるかチェック
                 Bomb existingBomb = clickedObj.GetComponentInChildren<Bomb>();
-
                 if (existingBomb != null)
                 {
                     Debug.Log("ここにはすでに爆弾が設置されています！");
-                    return; //すでに爆弾があれば、ここで処理を終了
+                    return;
                 }
 
-                // まだ爆弾がなければ、生成してブロックの子オブジェクトにする
-                PlaceItemFromStock(clickedObj);
+
+
+                // もし爆弾のストックがあり、かつ設置上限にも達していないなら「爆弾を設置」
+                if (stockItems.Count > 0 && totalPlacedCount < maxPlaceableBombs)
+                {
+                    PlaceItemFromStock(clickedObj);
+                }
+                // ストックがない、または上限に達している場合は「通常のブロック消去」として処理する！
+                //(ここはあくまでデバッグ用、後で必ず処理を消すこと♭)
+                else
+                {
+                    FallObject fallObj = clickedObj.GetComponent<FallObject>();
+                    Controller controller = UnityEngine.Object.FindFirstObjectByType<Controller>();
+
+                    if (fallObj != null && controller != null)
+                    {
+                        // Controllerに「この通常ブロックを消して、落下させて」とバトンを渡す
+                        controller.PerformBlockDelete(fallObj);
+                    }
+                }
             }
         }
     }
@@ -119,6 +124,13 @@ public class BombSet : MonoBehaviour
         GameObject spawnedBomb = Instantiate(itemToPlace, targetBlock.transform.position, Quaternion.identity);
         spawnedBomb.transform.SetParent(targetBlock.transform);
 
+        // コントローラーに「爆弾置いたから消すな」と通知
+        Controller controller = UnityEngine.Object.FindFirstObjectByType<Controller>();
+        if (controller != null)
+        {
+            controller.isBombPlacedThisFrame = true;
+        }
+       
         stockItems.RemoveAt(0);
         RefreshStockUI();
         totalPlacedCount++;

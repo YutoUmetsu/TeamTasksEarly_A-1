@@ -10,7 +10,6 @@ public class Controller : MonoBehaviour
     [SerializeField] float fallTime;
     float objHalfWidth;
 
-    //ゲームの状況管理用
     enum GameState
     {
         None = 0,
@@ -24,8 +23,16 @@ public class Controller : MonoBehaviour
     Action[] ControllerUpdate;
     Action[] OnExit;
 
+    public bool isBombPlacedThisFrame = false;
+
+    // ───【追加】インスペクターから登録しなくても動くように、自動登録用（旧BlockSpawnの処理の代わり）
+    // もし既存のBombSetがあれば、Startで自動的にブロックを登録します。
+    private BombSet bombSet;
+
     void Start()
     {
+        bombSet = UnityEngine.Object.FindFirstObjectByType<BombSet>();
+
         GenerateBoard();
         ControllerUpdate = new Action[(int)GameState.Max];
         OnExit = new Action[(int)GameState.Max];
@@ -37,9 +44,6 @@ public class Controller : MonoBehaviour
         float pos = boardSize / 2f - objHalfWidth;
     }
 
-    /// <summary>
-    /// 盤面生成
-    /// </summary>
     void GenerateBoard()
     {
         fallObjects = new FallObject[boardSize, boardSize];
@@ -50,163 +54,231 @@ public class Controller : MonoBehaviour
                 GameObject g = Instantiate(fallPrefab, new Vector2(x, y), Quaternion.identity);
                 fallObjects[x, y] = g.GetComponent<FallObject>();
                 fallObjects[x, y].StartUpFallObject(BlockState.Normal);
+
+                // 追加：新しく生成したブロックをBombSetのターゲットに自動登録
+                if (bombSet != null)
+                {
+                    bombSet.RegisterTarget(g);
+                }
             }
         }
     }
 
     void Update()
     {
-        // ステートに合わせた処理を行う
         ControllerUpdate[(int)nowState]();
     }
 
-    /// <summary>
-    /// 消すオブジェクトを選択
-    /// </summary>
-    /// <summary>
-    /// 消すオブジェクトを選択（ズレ防止修正版）
-    /// </summary>
     void SelectUpdate()
     {
-        // マウスの座標から消すオブジェクトを選択する
+        /* スクリプト実行順バグ防止のため、一時的にコメントアウト 
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
-            // マウスの画面座標をワールド座標（ゲーム内座標）に変換
             Vector3 worldPos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-
-            // 浮動小数点の誤差をなくすため、四捨五入でキレイな整数（0, 1, 2...）にする
             int gridX = Mathf.RoundToInt(worldPos.x);
             int gridY = Mathf.RoundToInt(worldPos.y);
 
-            // 盤面の配列の範囲内に入っているかチェック
             if (gridX >= 0 && gridX < boardSize && gridY >= 0 && gridY < boardSize)
             {
-                // 配列の中身が空（null）でなければ削除予定を設定
-                if (fallObjects[gridX, gridY] != null)
+                FallObject clickedObj = fallObjects[gridX, gridY];
+                if (clickedObj != null)
                 {
-                    fallObjects[gridX, gridY].SetDelete();
-                    Debug.Log($"クリック成功: [{gridX}, {gridY}] を消去予定にしました");
+                    Bomb bomb = clickedObj.GetComponentInChildren<Bomb>();
+                    if (bomb != null) return;
+
+                    SpawnCoinImmediate(clickedObj);
+                    clickedObj.SetDelete();
+                    OnExit[(int)nowState]?.Invoke();
                 }
             }
-            else
-            {
-                Debug.LogWarning($"盤面の外をクリックしています: [{gridX}, {gridY}]");
-            }
-        }
+        }*/
 
-        // 消すための準備へ
+        // スペースキーでのフェーズ遷移用デバッグだけ残しておきます
         if (Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             OnExit[(int)nowState]?.Invoke();
         }
     }
 
+    public void PerformBlockDelete(FallObject targetObj)
+    {
+        // 選択フェーズ中、かつ対象のブロックが存在する場合のみ実行
+        if (nowState != GameState.Select || targetObj == null) return;
 
-    /// <summary>
-    /// 消すために落ちる先を計算させる
-    /// </summary>
+        // その場で即座にコインを出す
+        SpawnCoinImmediate(targetObj);
+
+        // ブロックを消去（Delete）状態にする
+        targetObj.SetDelete();
+        Debug.Log($"通常ブロック消去: 安全に消去予定にしました");
+
+        // 落下フェーズへ進めるためのイベントを発火
+        OnExit[(int)nowState]?.Invoke();
+    }
+
+    //【追加】爆弾から「爆発したよ！」と呼び出される関数 
+    public void TriggerExplosionFall()
+    {
+        if (nowState == GameState.Select)
+        {
+            // 爆風の OnTriggerEnter2D が周囲のブロックを巻き込む時間を 0.02秒だけ待ってから遷移
+            Invoke("ExecuteExit", 0.02f);
+        }
+    }
+    private void ExecuteExit()
+    {
+        if (nowState == GameState.Select)
+        {
+            OnExit[(int)nowState]?.Invoke();
+        }
+    }
     void CalculateFallTargets()
     {
         for (int x = 0; x < boardSize; x++)
         {
-            int fallPos = 0;
+            int emptyCount = 0; // その列で「消えるブロック」が何個あるかを数えるカウンター
+
             for (int y = 0; y < boardSize; y++)
             {
-                // ★ ここに null チェックを追加
-                if (fallObjects[x, y] == null) continue;
-
-                if (fallObjects[x, y].state == BlockState.Empty) continue;
-
-                if (fallObjects[x, y].state != BlockState.Delete)
+                if (fallObjects[x, y] == null)
                 {
-                    fallObjects[x, y].SetFall(fallPos);
-                    fallPos++;
+                    emptyCount++;
+                    continue;
+                }
+
+                // もしこのブロックが消える予定（Delete）なら、空き地カウンターを増やす
+                if (fallObjects[x, y].state == BlockState.Delete || fallObjects[x, y].state == BlockState.Empty)
+                {
+                    emptyCount++;
+                }
+                // 生き残るブロックの場合
+                else
+                {
+                    // もし下に空き地（消えるブロック）が1個以上あったら、その分だけ下に落とす
+                    if (emptyCount > 0)
+                    {
+                        // 現在の y 座標から、見つかった空き地の数（emptyCount）を引く
+                        int targetY = y - emptyCount;
+
+                        // FallObject側が「着地先のY座標」を求めている場合は targetY を、
+                        // 「何マス下に落ちるか」を求めている場合は emptyCount を渡します。
+                        // 今の仕様に合わせて targetY を指定します。
+                        fallObjects[x, y].SetFall(targetY);
+                    }
+                    else
+                    {
+                        // 下に空き地がない場合は、その場に留まる（落下させない）
+                        // FallObjectの落下フラグ(isFall)を立てずに現在の位置をキープさせる
+                        fallObjects[x, y].SetFall(y);
+                    }
                 }
             }
         }
         nowState = GameState.Fall;
     }
 
-
-
-    /// <summary>
-    /// 落ちる処理、終わり次第消す
-    /// </summary>
-    /// <summary>
-    /// 落ちる処理、終わり次第消す
-    /// </summary>
     void FallUpdate()
     {
-        // 落とすオブジェクトがあるか確認用
-        bool fall = false;
+        bool anyBlockMoving = false;
+
         for (int x = 0; x < boardSize; x++)
         {
             for (int y = 0; y < boardSize; y++)
             {
-                // ★ ここに null チェックを追加
+                // 空っぽの部屋はスルー
                 if (fallObjects[x, y] == null) continue;
 
-                if (fallObjects[x, y].state == BlockState.Empty) continue;
+                // 消去予定（Delete）のものは動かないのでスルー
+                if (fallObjects[x, y].state == BlockState.Delete || fallObjects[x, y].state == BlockState.Empty) continue;
+
+                // 落ちるべきブロックがある場合
                 if (fallObjects[x, y].isFall)
                 {
-                    // 落とすものアリ
-                    fall = true;
-                    // 元の座標と落ちる時間を渡す
+                    anyBlockMoving = true;
+                    // 引数の y は使わずに、FallObjectの内部データ(toYPos)で移動するので 0 を渡すか、FallObject側を合わせます
                     fallObjects[x, y].Fall(y, fallTime);
                 }
             }
         }
 
-        // 消す処理へ
-        if (!fall) OnExit[(int)nowState]();
+        // 画面上の「すべてのブロック」が目的地に着地したら、満を持してDeleteフェーズ（データ整理）へ進む
+        if (!anyBlockMoving)
+        {
+            OnExit[(int)nowState]?.Invoke();
+        }
     }
 
-
-    /// <summary>
-    /// ブロックを消しつつ配列情報を更新する
-    /// </summary>
-    /// <summary>
-    /// ブロックを消しつつ、配列情報を【安全に】更新する
-    /// </summary>
+    public bool IsInSelectState()
+    {
+        return nowState == GameState.Select;
+    }
     void Delete()
     {
+        // 1. まず、消去予定（Delete）のブロックを完全にゲームから消し去る
         for (int x = 0; x < boardSize; x++)
         {
             for (int y = 0; y < boardSize; y++)
             {
-                // すでに空なら飛ばす
-                if (fallObjects[x, y] == null || fallObjects[x, y].state == BlockState.Empty) continue;
+                if (fallObjects[x, y] == null) continue;
 
-                // 消す予定のオブジェクトの場合
                 if (fallObjects[x, y].state == BlockState.Delete)
                 {
                     fallObjects[x, y].EmptySelf();
-
-                    // 【重要】ヒエラルキーからも完全に消去したい場合は Destory を呼ぶ
-                    // Destroy(fallObjects[x, y].gameObject); 
-
-                    fallObjects[x, y] = null; // 配列を空にする
-                }
-                // 生き残っていて、下に落ちるアニメーションをしたオブジェクトの場合
-                else
-                {
-                    int targetY = fallObjects[x, y].PosY();
-
-                    // 自分の現在地（y）と、落ちるべき位置（targetY）が違う場合のみ移動
-                    if (y != targetY)
-                    {
-                        // 新しい位置に自分を代入
-                        fallObjects[x, targetY] = fallObjects[x, y];
-
-                        // 元いた場所はキレイに空（null）にする（これで二重処理を防ぐ）
-                        fallObjects[x, y] = null;
-                    }
+                    Destroy(fallObjects[x, y].gameObject);
+                    fallObjects[x, y] = null;
                 }
             }
         }
 
-        // 選択する処理へ戻る
+        // 2. 次に、中身が下に落ちた後の「新しい2次元配列（Grid）」を正しく作り直す
+        // これをやらないと、次のクリックの時に「見た目と違う場所」が反応してしまいます
+        FallObject[,] nextGrid = new FallObject[boardSize, boardSize];
+
+        for (int x = 0; x < boardSize; x++)
+        {
+            for (int y = 0; y < boardSize; y++)
+            {
+                if (fallObjects[x, y] == null) continue;
+
+                // ブロックが記憶している「着地したY座標」を取得する
+                int trueY = fallObjects[x, y].PosY();
+                nextGrid[x, trueY] = fallObjects[x, y];
+            }
+        }
+
+        // 新しいグリッドを本番の配列に上書きする
+        fallObjects = nextGrid;
+
+        //すべてが綺麗に片付いたので、プレイヤーの入力受付（Select）状態に戻す！
         nowState = GameState.Select;
     }
 
+    //ブロックが消去予定になった瞬間に、その場で即座にコインを出す関数
+    public void SpawnCoinImmediate(FallObject targetObj)
+    {
+        if (targetObj == null) return;
+
+        DestructibleBlock db = targetObj.GetComponent<DestructibleBlock>();
+        if (db != null)
+        {
+            // 1. コイン加算
+            if (CoinManager.Instance != null)
+            {
+                CoinManager.Instance.AddCoin(db.coinRewardAmount);
+            }
+
+            // 2. コインの跳ね上げ演出（爆発したその場で即座にピョコンと跳ねる！）
+            if (db.coinVisualPrefab != null)
+            {
+                GameObject spawnedCoin = Instantiate(db.coinVisualPrefab, db.transform.position, Quaternion.identity);
+                Rigidbody2D coinRb = spawnedCoin.GetComponent<Rigidbody2D>();
+                if (coinRb != null)
+                {
+                    float randomX = UnityEngine.Random.Range(-db.sideForce, db.sideForce);
+                    Vector2 launchVelocity = new Vector2(randomX, db.upwardForce);
+                    coinRb.linearVelocity = launchVelocity;
+                }
+            }
+        }
+    }
 }
