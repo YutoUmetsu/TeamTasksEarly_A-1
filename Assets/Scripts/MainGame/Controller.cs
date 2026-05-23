@@ -6,6 +6,7 @@ public class Controller : MonoBehaviour
 {
     [SerializeField] GameObject fallPrefab;
     [SerializeField] int boardSize;
+    Vector2 startPos;
     FallObject[,] fallObjects;
     [SerializeField] float fallTime;
     float objHalfWidth;
@@ -31,6 +32,8 @@ public class Controller : MonoBehaviour
 
     void Start()
     {
+        startPos = transform.position;
+
         bombSet = UnityEngine.Object.FindFirstObjectByType<BombSet>();
 
         GenerateBoard();
@@ -51,7 +54,9 @@ public class Controller : MonoBehaviour
         {
             for (int y = 0; y < boardSize; y++)
             {
-                GameObject g = Instantiate(fallPrefab, new Vector2(x, y), Quaternion.identity);
+                Vector2 spawnPos=startPos+new Vector2(x, y);
+
+                GameObject g = Instantiate(fallPrefab, spawnPos, Quaternion.identity);
                 fallObjects[x, y] = g.GetComponent<FallObject>();
                 fallObjects[x, y].StartUpFallObject(BlockState.Normal);
 
@@ -165,12 +170,12 @@ public class Controller : MonoBehaviour
                     if (emptyCount > 0)
                     {
                         // 現在の y 座標から、見つかった空き地の数（emptyCount）を引く
-                        int targetY = y - emptyCount;
+                        Vector2 targetY = new Vector2(0, startPos.y + y - emptyCount);
 
                         // FallObject側が「着地先のY座標」を求めている場合は targetY を、
                         // 「何マス下に落ちるか」を求めている場合は emptyCount を渡します。
                         // 今の仕様に合わせて targetY を指定します。
-                        fallObjects[x, y].SetFall(targetY);
+                        fallObjects[x, y].SetFall(targetY.y);
                     }
                     else
                     {
@@ -203,7 +208,7 @@ public class Controller : MonoBehaviour
                 {
                     anyBlockMoving = true;
                     // 引数の y は使わずに、FallObjectの内部データ(toYPos)で移動するので 0 を渡すか、FallObject側を合わせます
-                    fallObjects[x, y].Fall(y, fallTime);
+                    fallObjects[x, y].Fall(0, fallTime);
                 }
             }
         }
