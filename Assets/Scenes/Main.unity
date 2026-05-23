@@ -1094,6 +1094,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1908106306 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3315899685386054219, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
+  m_PrefabInstance: {fileID: 2012205611}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1941640962
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1273,7 +1278,7 @@ PrefabInstance:
     - target: {fileID: 6226850868989169387, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
       propertyPath: spawnPoint
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1908106306}
     - target: {fileID: 8983576289099948456, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
       propertyPath: fallTime
       value: 1
