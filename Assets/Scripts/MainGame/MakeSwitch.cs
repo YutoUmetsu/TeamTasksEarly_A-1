@@ -1,13 +1,11 @@
 using UnityEngine;
-using System.Collections; // 時間差の処理（コルーチン）を使うために必要
-using UnityEngine.SceneManagement; // 画面を切り替える（シーン遷移）ために必要
+using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class MakeSwitch : MonoBehaviour
 {
-    // 今までに置かれた爆弾の数を数えるカウンター
     public int BombCount { get; set; }
 
-    // ─── 修正：固定の数字をやめて、爆弾設置システム（BombSet）と連動させる ───
     [Header("爆弾設置システム（BombSet）のオブジェクトをここに")]
     [SerializeField] private BombSet bombSet;
 
@@ -20,9 +18,11 @@ public class MakeSwitch : MonoBehaviour
     [Header("移動先のシーン名")]
     [SerializeField] private string nextSceneName = "ResultScene";
 
+    // 現在までに「起爆ボタンを押した総回数」を記録するカウンター
+    private int totalExplodeCount = 0;
+
     void Start()
     {
-        // もしインスペクターで登録し忘れていたら、自動で画面内から探してくる
         if (bombSet == null)
         {
             bombSet = UnityEngine.Object.FindFirstObjectByType<BombSet>();
@@ -31,31 +31,23 @@ public class MakeSwitch : MonoBehaviour
         if (bombGeneratorObj != null) bombGeneratorObj.SetActive(false);
     }
 
-    // ゲーム中、ずーっと高速でループ実行される（1秒間に何十回も）
     void Update()
     {
-        // ─── 修正：自動連動システム ───
         if (bombSet != null)
         {
-            // スイッチ出現に必要な数を、BombSet側で決めた「最大設置数」と同じにする（最初は3）
-            int requiredCount = bombSet.maxPlaceableBombs;
-
-            // もし「置かれた数」が「今の最大設置数」に達していて、かつ「スイッチがまだ隠れている」なら
-            if (BombCount >= requiredCount && bombGeneratorObj != null && !bombGeneratorObj.activeSelf)
+            // 仕様変更：1弾置かれたら（BombCountが1以上になったら）即座にスイッチを召喚
+            if (BombCount >= 1 && bombGeneratorObj != null && !bombGeneratorObj.activeSelf)
             {
-                // 条件クリア！スイッチを画面に表示する
                 bombGeneratorObj.SetActive(true);
             }
         }
     }
 
-    // スイッチ（UIボタンなど）が押されたときに呼び出す処理（全爆破ボタン）
+    // スイッチが押されたときに呼び出す処理（起爆ボタン）
     public void ExplodeAllBombs()
     {
-        // ステージ上にある「すべての爆弾」を、残さず探してリストにする
         Bomb[] allBombs = Object.FindObjectsByType<Bomb>(FindObjectsSortMode.None);
 
-        // リストに入った爆弾を、端から順番に1個ずつ爆発させていく
         foreach (Bomb b in allBombs)
         {
             if (b != null)
@@ -64,17 +56,58 @@ public class MakeSwitch : MonoBehaviour
             }
         }
 
-        // 仕事は終わったので、スイッチの見た目をまた隠す
+        // 起爆処理を行ったので、一旦スイッチの見た目を隠す
         if (bombGeneratorObj != null) bombGeneratorObj.SetActive(false);
 
-        // カウンターをゼロにリセット
+        // カウンターをリセット（次の1個のため）
         BombCount = 0;
 
-        // 「落下の完了監視」コルーチンを起動
-        StartCoroutine(WaitForFallAndChangeScene());
+        // 起爆した回数をカウントアップ
+        totalExplodeCount++;
+
+        if (bombSet != null)
+        {
+            // もし今回の起爆が「最後の最大数」に達しているなら、シーン遷移ルートへ
+            if (totalExplodeCount >= bombSet.maxPlaceableBombs)
+            {
+                StartCoroutine(WaitForFallAndChangeScene());
+            }
+            // まだ上限に達していないなら、パズル続行（落下完了を待ってから次の設置ロックを解除）
+            else
+            {
+                StartCoroutine(WaitForFallAndUnlockNextBomb());
+            }
+        }
+        else
+        {
+            // 万が一BombSetが見つからない場合の安全策
+            StartCoroutine(WaitForFallAndChangeScene());
+        }
     }
 
-    //落下がすべて終わるのを監視してシーンを切り替える関数 
+    // 落下がすべて終わるのを監視して、ロックを解除して次の配置へ戻すコルーチン
+    private IEnumerator WaitForFallAndUnlockNextBomb()
+    {
+        Controller controller = Object.FindFirstObjectByType<Controller>();
+
+        if (controller != null)
+        {
+            yield return new WaitForSeconds(0.1f);
+
+            while (!controller.IsInSelectState())
+            {
+                yield return null;
+            }
+        }
+
+        // 落下とデータ整理が完全に終わったら、次の爆弾を置けるようにロックを解除
+        if (bombSet != null)
+        {
+            bombSet.UnlockPlacement();
+        }
+    }
+
+    // 最後の落下がすべて終わるのを監視してシーンを切り替えるコルーチン 
     private IEnumerator WaitForFallAndChangeScene()
     {
         Controller controller = Object.FindFirstObjectByType<Controller>();
@@ -83,7 +116,6 @@ public class MakeSwitch : MonoBehaviour
         {
             yield return new WaitForSeconds(0.1f);
 
-            //
             while (!controller.IsInSelectState())
             {
                 yield return null;
@@ -95,6 +127,7 @@ public class MakeSwitch : MonoBehaviour
         }
 
         yield return new WaitForSeconds(0.5f);
+        Debug.Log("すべてのステージ起爆・落下ループが完了。リザルトへ遷移します。");
         SceneManager.LoadScene(nextSceneName);
     }
 }
