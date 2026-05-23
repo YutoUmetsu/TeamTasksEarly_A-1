@@ -113,6 +113,7 @@ public class Controller : MonoBehaviour
         {
             int emptyCount = 0;
 
+            // 1. まずはその列の下から上まで、既存のブロックの移動先を計算
             for (int y = 0; y < boardSize; y++)
             {
                 if (fallObjects[x, y] == null)
@@ -132,7 +133,6 @@ public class Controller : MonoBehaviour
                         Vector2 targetY = new Vector2(0, startPos.y + y - emptyCount);
                         int targetGridY = y - emptyCount;
 
-                        // 修正された引数2つ版の SetFall を呼び出す
                         fallObjects[x, y].SetFall(targetY.y, targetGridY);
                     }
                     else
@@ -141,7 +141,53 @@ public class Controller : MonoBehaviour
                     }
                 }
             }
+
+            // 2. 【ここが正しい場所！】 y のループが終わった後、空いた数（emptyCount）だけ上から補充する
+            if (emptyCount > 0)
+            {
+                // 現在の配列の空きスペース（Deleteなどで消えた場所）に、
+                // 新しいブロックを一旦詰めて登録するためのポインタ（インデックス）
+                int arrayYPointer = 0;
+
+                for (int i = 0; i < emptyCount; i++)
+                {
+                    // 盤面のさらに上空（boardSize + i）に出現させる
+                    int spawnYIndex = boardSize + i;
+                    Vector2 spawnPos = startPos + new Vector2(x, spawnYIndex);
+
+                    // 新しいブロックを生成
+                    GameObject newBlock = Instantiate(fallPrefab, spawnPos, Quaternion.identity);
+                    FallObject fallObj = newBlock.GetComponent<FallObject>();
+
+                    // 着地先は「既存のやつらが下に詰まった後の、上部の空き地」
+                    int targetGridY = boardSize - emptyCount + i;
+                    Vector2 targetWorldY = startPos + new Vector2(x, targetGridY);
+
+                    // 初期化して、落下を命令
+                    fallObj.StartUpFallObject(BlockState.Normal, spawnYIndex);
+                    fallObj.SetFall(targetWorldY.y, targetGridY);
+
+                    if (bombSet != null) bombSet.RegisterTarget(newBlock);
+
+                    // 配列内で「すでに空っぽ（null か 消去済み）」の場所を探して、そこに一時キープします。
+                    // これにより、この後の FallUpdate がこの新ブロックも一緒に動かしてくれます！
+                    while (arrayYPointer < boardSize)
+                    {
+                        if (fallObjects[x, arrayYPointer] == null ||
+                            fallObjects[x, arrayYPointer].state == BlockState.Delete ||
+                            fallObjects[x, arrayYPointer].state == BlockState.Empty)
+                        {
+                            fallObjects[x, arrayYPointer] = fallObj;
+                            arrayYPointer++;
+                            break;
+                        }
+                        arrayYPointer++;
+                    }
+                }
+            }
         }
+
+        // 全列の計算と補充が終わったら、一斉に落下ステートへ！
         nowState = GameState.Fall;
     }
 
