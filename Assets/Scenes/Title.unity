@@ -256,6 +256,65 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 153480737}
   m_CullTransparentMesh: 1
+--- !u!1 &158145662
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 158145665}
+  - component: {fileID: 158145664}
+  - component: {fileID: 158145663}
+  m_Layer: 0
+  m_Name: SkillTreeEfeectiveManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &158145663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 158145662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cea30f9e10a649c4db24c8a9de7cc7cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BombInventoryManager
+  bonusMaxBombs: 0
+--- !u!114 &158145664
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 158145662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70e0d1823b124fe448f6e0101d94008c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BombPowerManager
+  bonusDamage: 0
+--- !u!4 &158145665
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 158145662}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &188710551
 GameObject:
   m_ObjectHideFlags: 0
@@ -1718,3 +1777,4 @@ SceneRoots:
   - {fileID: 1986885405}
   - {fileID: 1601661093}
   - {fileID: 663237725}
+  - {fileID: 158145665}
