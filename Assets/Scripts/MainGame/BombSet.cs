@@ -78,13 +78,32 @@ public class BombSet : MonoBehaviour
 
             if (targetItems.Contains(clickedObj))
             {
-                Bomb existingBomb = clickedObj.GetComponentInChildren<Bomb>();
-                if (existingBomb != null)
+                // 1. クリックしたオブジェクト自体に「Bomb」コンポーネントがあるか調べる（降ってきた爆弾対策）
+                bool isBombBlock = clickedObj.GetComponent<Bomb>() != null;
+
+                // 2. クリックしたオブジェクトの子供（孫以下も含めて全部）に「Bomb」があるか調べる
+                // ただし、自分自身に付いているものは除外するために、全検索から自分を引く
+                Bomb[] allBombs = clickedObj.GetComponentsInChildren<Bomb>();
+                bool hasPlacedBomb = false;
+
+                foreach (Bomb b in allBombs)
                 {
-                    Debug.Log("ここにはすでに爆弾が設置されています！");
+                    // 見つかったBombが、自分自身のコンポーネントじゃない ＝ 手動で置いた子供の爆弾！
+                    if (b.gameObject != clickedObj)
+                    {
+                        hasPlacedBomb = true;
+                        break;
+                    }
+                }
+
+                // 「降ってきた爆弾ブロック」であるか、すでに「手動設置された爆弾」があればガード！
+                if (isBombBlock || hasPlacedBomb)
+                {
+                    Debug.Log("ここにはすでに爆弾が存在するか、設置されています！");
                     return;
                 }
 
+                // ─── 以下はそのまま ───
                 // シングルトンのボーナス値を足した「本当の最大設置数」を計算する
                 int currentMaxBombs = maxPlaceableBombs;
                 if (BombInventoryManager.Instance != null)

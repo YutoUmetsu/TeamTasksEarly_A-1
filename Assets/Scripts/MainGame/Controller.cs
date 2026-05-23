@@ -11,6 +11,10 @@ public class Controller : MonoBehaviour
     [SerializeField] float fallTime;
     float objHalfWidth;
 
+    [Header("爆弾補充の設定")]
+    [SerializeField] System.Collections.Generic.List<GameObject> bombPrefabs; // 爆弾プレハブのリスト
+    [SerializeField] int bombSpawnCountPerTurn = 1; // 1ターンに落とす爆弾の固定数
+
     enum GameState
     {
         None = 0,
@@ -109,11 +113,49 @@ public class Controller : MonoBehaviour
 
     void CalculateFallTargets()
     {
+        // --- 1. 今回のターンで「全体で何個のブロックが補充されるか」をあらかじめ計算する ---
+        int totalNewBlocksCount = 0;
+        for (int x = 0; x < boardSize; x++)
+        {
+            for (int y = 0; y < boardSize; y++)
+            {
+                if (fallObjects[x, y] == null || fallObjects[x, y].state == BlockState.Delete || fallObjects[x, y].state == BlockState.Empty)
+                {
+                    totalNewBlocksCount++;
+                }
+            }
+        }
+
+        // --- 2. 爆弾を落とす場所（当選インデックス）をランダムに決定する ---
+        System.Collections.Generic.HashSet<int> bombSelectionIndices = new System.Collections.Generic.HashSet<int>();
+
+        // インスペクターの基本設定値に、新しいマネージャーのボーナス値を加算する
+        int currentTurnBombCount = bombSpawnCountPerTurn;
+        if (BombSpawnManager.Instance != null)
+        {
+            currentTurnBombCount += BombSpawnManager.Instance.bonusSpawnBombs;
+        }
+
+        // 補充総数より設定された爆弾数(n)が多い場合は、補充総数を上限にする
+        int actualBombCountToSpawn = Mathf.Min(currentTurnBombCount, totalNewBlocksCount);
+       
+        // 重複のないランダムな「くじ（0 ～ 補充総数-1）」を作成
+        while (bombSelectionIndices.Count < actualBombCountToSpawn)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, totalNewBlocksCount);
+            bombSelectionIndices.Add(randomIndex);
+        }
+
+        // 全体の補充ブロックに通し番号をつけるためのカウンター
+        int currentSpawnGlobalIndex = 0;
+
+
+        // --- 3. ここから各列の落下・補充のメイン計算 ---
         for (int x = 0; x < boardSize; x++)
         {
             int emptyCount = 0;
 
-            // 1. まずはその列の下から上まで、既存のブロックの移動先を計算
+            // 既存ブロックの落下ターゲット計算
             for (int y = 0; y < boardSize; y++)
             {
                 if (fallObjects[x, y] == null)
@@ -132,7 +174,6 @@ public class Controller : MonoBehaviour
                     {
                         Vector2 targetY = new Vector2(0, startPos.y + y - emptyCount);
                         int targetGridY = y - emptyCount;
-
                         fallObjects[x, y].SetFall(targetY.y, targetGridY);
                     }
                     else
@@ -142,35 +183,46 @@ public class Controller : MonoBehaviour
                 }
             }
 
-            // 2. 【ここが正しい場所！】 y のループが終わった後、空いた数（emptyCount）だけ上から補充する
+            // この列に空き地（emptyCount）があれば上から補充
             if (emptyCount > 0)
             {
-                // 現在の配列の空きスペース（Deleteなどで消えた場所）に、
-                // 新しいブロックを一旦詰めて登録するためのポインタ（インデックス）
                 int arrayYPointer = 0;
 
                 for (int i = 0; i < emptyCount; i++)
                 {
-                    // 盤面のさらに上空（boardSize + i）に出現させる
                     int spawnYIndex = boardSize + i;
                     Vector2 spawnPos = startPos + new Vector2(x, spawnYIndex);
 
-                    // 新しいブロックを生成
-                    GameObject newBlock = Instantiate(fallPrefab, spawnPos, Quaternion.identity);
+                    // ─── 【重要：ここで通常ブロックか爆弾かを判定！】 ───
+                    GameObject prefabToSpawn = fallPrefab; // 基本は通常ブロック
+
+                    // もし今回の通し番号が「爆弾の当選くじ」に含まれていて、かつ爆弾リストに中身があれば
+                    if (bombSelectionIndices.Contains(currentSpawnGlobalIndex) && bombPrefabs != null && bombPrefabs.Count > 0)
+                    {
+                        // 爆弾リストの中からランダムに1種類選ぶ
+                        int randomBombType = UnityEngine.Random.Range(0, bombPrefabs.Count);
+                        if (bombPrefabs[randomBombType] != null)
+                        {
+                            prefabToSpawn = bombPrefabs[randomBombType];
+                        }
+                    }
+
+                    // 通し番号を進める
+                    currentSpawnGlobalIndex++;
+
+                    // 決定したプレハブ（通常 or 爆弾）を生成！
+                    GameObject newBlock = Instantiate(prefabToSpawn, spawnPos, Quaternion.identity);
                     FallObject fallObj = newBlock.GetComponent<FallObject>();
 
-                    // 着地先は「既存のやつらが下に詰まった後の、上部の空き地」
                     int targetGridY = boardSize - emptyCount + i;
                     Vector2 targetWorldY = startPos + new Vector2(x, targetGridY);
 
-                    // 初期化して、落下を命令
                     fallObj.StartUpFallObject(BlockState.Normal, spawnYIndex);
                     fallObj.SetFall(targetWorldY.y, targetGridY);
 
                     if (bombSet != null) bombSet.RegisterTarget(newBlock);
 
-                    // 配列内で「すでに空っぽ（null か 消去済み）」の場所を探して、そこに一時キープします。
-                    // これにより、この後の FallUpdate がこの新ブロックも一緒に動かしてくれます！
+                    // 配列への一時キープ
                     while (arrayYPointer < boardSize)
                     {
                         if (fallObjects[x, arrayYPointer] == null ||
@@ -187,7 +239,6 @@ public class Controller : MonoBehaviour
             }
         }
 
-        // 全列の計算と補充が終わったら、一斉に落下ステートへ！
         nowState = GameState.Fall;
     }
 

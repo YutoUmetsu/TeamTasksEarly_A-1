@@ -267,6 +267,7 @@ GameObject:
   - component: {fileID: 158145665}
   - component: {fileID: 158145664}
   - component: {fileID: 158145663}
+  - component: {fileID: 158145666}
   m_Layer: 0
   m_Name: SkillTreeEfeectiveManager
   m_TagString: Untagged
@@ -315,6 +316,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &158145666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 158145662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67dd263b0dfe69748b363b08a26de281, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BombSpawnManager
+  bonusSpawnBombs: 0
 --- !u!1 &188710551
 GameObject:
   m_ObjectHideFlags: 0
