@@ -85,7 +85,15 @@ public class BombSet : MonoBehaviour
                     return;
                 }
 
-                if (stockItems.Count > 0 && totalPlacedCount < maxPlaceableBombs)
+                // シングルトンのボーナス値を足した「本当の最大設置数」を計算する
+                int currentMaxBombs = maxPlaceableBombs;
+                if (BombInventoryManager.Instance != null)
+                {
+                    currentMaxBombs += BombInventoryManager.Instance.bonusMaxBombs;
+                }
+
+                // 計算した currentMaxBombs を使って条件チェック
+                if (stockItems.Count > 0 && totalPlacedCount < currentMaxBombs)
                 {
                     PlaceItemFromStock(clickedObj);
                 }
@@ -120,7 +128,6 @@ public class BombSet : MonoBehaviour
         RefreshStockUI();
         totalPlacedCount++;
 
-        // 1個置いたので即座に設置システムをロックする
         isLocked = true;
 
         if (makeSwitch != null)
@@ -128,7 +135,13 @@ public class BombSet : MonoBehaviour
             makeSwitch.BombCount++;
         }
 
-        Debug.Log($"設置完了！ {totalPlacedCount}/{maxPlaceableBombs}個。次の起爆まで設置をロックします。");
+        // ログ表示もシングルトンのボーナスを反映した最大数にする
+        int currentMaxBombs = maxPlaceableBombs;
+        if (BombInventoryManager.Instance != null)
+        {
+            currentMaxBombs += BombInventoryManager.Instance.bonusMaxBombs;
+        }
+        Debug.Log($"設置完了！ {totalPlacedCount}/{currentMaxBombs}個。次の起爆まで設置をロックします。");
     }
 
     public void RegisterTarget(GameObject target)
