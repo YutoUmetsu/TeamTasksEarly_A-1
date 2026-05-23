@@ -1291,6 +1291,30 @@ PrefabInstance:
       propertyPath: fallPrefab
       value: 
       objectReference: {fileID: 3468364833027856995, guid: dbaf3b5e54a75ed48924439df5043e96, type: 3}
+    - target: {fileID: 8983576289099948456, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
+      propertyPath: bombPrefabs.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983576289099948456, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
+      propertyPath: 'bombPrefabs.Array.data[0]'
+      value: 
+      objectReference: {fileID: 7016810677370617733, guid: 22e1efdaf400aa248ae1233cdd0dce3a, type: 3}
+    - target: {fileID: 8983576289099948456, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
+      propertyPath: 'bombPrefabs.Array.data[1]'
+      value: 
+      objectReference: {fileID: 3712599442006464506, guid: cf310a0c8a52bb145881e165c0a1768a, type: 3}
+    - target: {fileID: 8983576289099948456, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
+      propertyPath: 'bombPrefabs.Array.data[2]'
+      value: 
+      objectReference: {fileID: 5444067939016735567, guid: bfbcd235efecf684a97f3d8cbea54ef3, type: 3}
+    - target: {fileID: 8983576289099948456, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
+      propertyPath: 'bombPrefabs.Array.data[3]'
+      value: 
+      objectReference: {fileID: 2315365858012419683, guid: 42c81f2f4bf281a42b11123614b37710, type: 3}
+    - target: {fileID: 8983576289099948456, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
+      propertyPath: 'bombPrefabs.Array.data[4]'
+      value: 
+      objectReference: {fileID: 6198674485376676593, guid: e634bb0909a7bf34b8f25b043605ef33, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 4848836394877595218, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
