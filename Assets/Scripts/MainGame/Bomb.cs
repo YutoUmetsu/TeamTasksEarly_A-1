@@ -50,10 +50,12 @@ public class Bomb : MonoBehaviour
         Destroy(gameObject, destroyDelay);
     }
 
-    // ほんの一瞬だけ判定を維持してオフに
+    // 物理演算が確実に1回計算されるのを待ってから判定をオフにする
     private System.Collections.IEnumerator DisableCollidersDelayed()
     {
-        yield return new WaitForSeconds(0.05f); // 0.05秒だけ待つ（落ちてくるよりは圧倒的に早い）
+        // 通常の1フレーム待機（null）ではなく、物理演算の更新（FixedUpdate）を確実に1回待つ
+        yield return new WaitForFixedUpdate();
+
         if (explosionAreaGroup != null)
         {
             Collider2D[] explosionColliders = explosionAreaGroup.GetComponentsInChildren<Collider2D>();

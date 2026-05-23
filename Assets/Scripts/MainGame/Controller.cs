@@ -116,17 +116,24 @@ public class Controller : MonoBehaviour
         OnExit[(int)nowState]?.Invoke();
     }
 
-    //【追加】爆弾から「爆発したよ！」と呼び出される関数 
+    // 【修正】爆弾から「爆発したよ！」と呼び出される関数
     public void TriggerExplosionFall()
     {
         if (nowState == GameState.Select)
         {
-            // 爆風の OnTriggerEnter2D が周囲のブロックを巻き込む時間を 0.02秒だけ待ってから遷移
-            Invoke("ExecuteExit", 0.02f);
+            // 秒数指定のInvokeをやめ、物理演算の同期が確実にとれるコルーチンを開始する
+            StartCoroutine(WaitAndExecuteExit());
         }
     }
-    private void ExecuteExit()
+    private System.Collections.IEnumerator WaitAndExecuteExit()
     {
+        // 1. 物理演算（FixedUpdate）が確実に1回計算されるのをじっと待つ
+        yield return new WaitForFixedUpdate();
+
+        // 2. その直後のフレームまで待って、判定の処理を完全に完了させる
+        yield return null;
+
+        // 3. 爆風の処理が100%終わったので、安全に落下計算へ進む！
         if (nowState == GameState.Select)
         {
             OnExit[(int)nowState]?.Invoke();
