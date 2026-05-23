@@ -23,7 +23,7 @@ public class Controller : MonoBehaviour
     Action[] ControllerUpdate;
     Action[] OnExit;
 
-    public bool isBombPlacedThisFrame = false;
+    [System.NonSerialized] public bool isBombPlacedThisFrame = false;
 
     // ───【追加】インスペクターから登録しなくても動くように、自動登録用（旧BlockSpawnの処理の代わり）
     // もし既存のBombSetがあれば、Startで自動的にブロックを登録します。
