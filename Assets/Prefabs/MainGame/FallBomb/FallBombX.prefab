@@ -783,6 +783,10 @@ PrefabInstance:
       propertyPath: uiSprite
       value: 
       objectReference: {fileID: -1680013010550609027, guid: 7e8ce7b5a35dbb44b9dac459a5646741, type: 3}
+    - target: {fileID: 5766869815665447289, guid: b9f9ff2fe3e22004aaeacf941f4d1a8b, type: 3}
+      propertyPath: baseDamage
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 6152057092409105914, guid: b9f9ff2fe3e22004aaeacf941f4d1a8b, type: 3}
       propertyPath: targetNames.Array.size
       value: 1
@@ -861,6 +865,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FallObject
   toYPos: 0
+  maxHp: 999
 --- !u!4 &5268619260533233646 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2428784910108352532, guid: b9f9ff2fe3e22004aaeacf941f4d1a8b, type: 3}

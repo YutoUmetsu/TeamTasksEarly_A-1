@@ -15,6 +15,10 @@ public class FallObject : MonoBehaviour
     private int gridY; // 自分が今何マス目にいるかのインデックス (0, 1, 2...)
     SpriteRenderer spriteRenderer;
 
+    [Header("耐久値（体力）の設定")]
+    [SerializeField] private int maxHp = 1; // インスペクターでブロックごとに耐久値を変えられます
+    private int currentHp;
+
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -29,6 +33,8 @@ public class FallObject : MonoBehaviour
         toYPos = transform.position.y;
         gridY = initialGridY; // 最初のマス目を記憶
         isFall = false;
+
+        currentHp = maxHp; // 体力を満タンに初期化
     }
 
     public void SetDelete()
@@ -96,5 +102,28 @@ public class FallObject : MonoBehaviour
     public int PosY()
     {
         return gridY;
+    }
+
+    /// <summary>
+    /// ダメージを受ける関数。体力が0になったら消去フラグを立てる
+    /// </summary>
+    public void TakeDamage(int damageAmount)
+    {
+        if (state == BlockState.Delete || state == BlockState.Empty) return;
+
+        currentHp -= damageAmount;
+        Debug.Log($"{gameObject.name} に {damageAmount} のダメージ！ (残りHP: {currentHp})");
+        if (currentHp <= 0)
+        {
+            
+            // コインマネージャーやコントローラー経由でコイン演出を呼び出す
+            Controller controller = UnityEngine.Object.FindFirstObjectByType<Controller>();
+            if (controller != null)
+            {
+                controller.SpawnCoinImmediate(this); // 自分自身を渡してコインを飛ばす！
+            }
+
+            SetDelete();
+        }
     }
 }

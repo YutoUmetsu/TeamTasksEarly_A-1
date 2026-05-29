@@ -249,6 +249,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FallObject
   toYPos: 0
+  maxHp: 999
 --- !u!4 &6537533630835807863 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8398968843400352484, guid: cd9b77be4e68e12419c7119880dcd439, type: 3}
