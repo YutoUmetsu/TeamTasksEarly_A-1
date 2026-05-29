@@ -1292,6 +1292,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 3468364833027856995, guid: dbaf3b5e54a75ed48924439df5043e96, type: 3}
     - target: {fileID: 8983576289099948456, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
+      propertyPath: rareBlockSpawnChance
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983576289099948456, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
       propertyPath: bombPrefabs.Array.size
       value: 5
       objectReference: {fileID: 0}
@@ -1315,6 +1319,22 @@ PrefabInstance:
       propertyPath: 'bombPrefabs.Array.data[4]'
       value: 
       objectReference: {fileID: 6198674485376676593, guid: e634bb0909a7bf34b8f25b043605ef33, type: 3}
+    - target: {fileID: 8983576289099948456, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
+      propertyPath: rareBlockPrefabs.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983576289099948456, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
+      propertyPath: 'rareBlockPrefabs.Array.data[0]'
+      value: 
+      objectReference: {fileID: 3468364833027856995, guid: 44c6e2ba82ccf6a4a8e18e724bc49cc7, type: 3}
+    - target: {fileID: 8983576289099948456, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
+      propertyPath: 'rareBlockPrefabs.Array.data[1]'
+      value: 
+      objectReference: {fileID: 3468364833027856995, guid: af5067c7658d76548941babb6de015dc, type: 3}
+    - target: {fileID: 8983576289099948456, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
+      propertyPath: 'rareBlockPrefabs.Array.data[2]'
+      value: 
+      objectReference: {fileID: 3468364833027856995, guid: b710e164754aafd4dbc97f32c76eb28e, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 4848836394877595218, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
