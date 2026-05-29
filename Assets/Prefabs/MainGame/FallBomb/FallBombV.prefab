@@ -153,6 +153,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ExplosionHit
   targetNames:
   - Block(kari)
+  - Block(kari) 2
+  - Block(kari) 3
+  - Block(kari) 4
 --- !u!1 &3613551362475108605
 GameObject:
   m_ObjectHideFlags: 0
@@ -306,6 +309,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ExplosionHit
   targetNames:
   - Block(kari)
+  - Block(kari) 2
+  - Block(kari) 3
+  - Block(kari) 4
 --- !u!1 &4393129388843459943
 GameObject:
   m_ObjectHideFlags: 0
@@ -586,6 +592,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ExplosionHit
   targetNames:
   - Block(kari)
+  - Block(kari) 2
+  - Block(kari) 3
+  - Block(kari) 4
 --- !u!1 &5444067939016735567
 GameObject:
   m_ObjectHideFlags: 0
@@ -636,6 +645,7 @@ MonoBehaviour:
   explosionAreaGroup: {fileID: 4629794334191156205}
   destroyDelay: 0.3
   uiSprite: {fileID: -1044015532666706457, guid: 4fd7de34cc5c5e541bee15cb197eef81, type: 3}
+  baseDamage: 1
 --- !u!114 &2390430911483495676
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -649,6 +659,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FallObject
   toYPos: 0
+  maxHp: 999
 --- !u!1 &7127231658718218189
 GameObject:
   m_ObjectHideFlags: 0
@@ -756,6 +767,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ExplosionHit
   targetNames:
   - Block(kari)
+  - Block(kari) 2
+  - Block(kari) 3
+  - Block(kari) 4
 --- !u!61 &2932663177257041875
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -955,3 +969,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ExplosionHit
   targetNames:
   - Block(kari)
+  - Block(kari) 2
+  - Block(kari) 3
+  - Block(kari) 4
