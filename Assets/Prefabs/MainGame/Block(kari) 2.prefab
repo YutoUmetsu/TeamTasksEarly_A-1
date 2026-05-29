@@ -81,7 +81,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -6847810602820697571, guid: c068af7851d842143accb0cf19af51a1, type: 3}
+  m_Sprite: {fileID: -4178046375966092550, guid: df1a338ba9d79a940bfa5b1c2fc1631b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -107,7 +107,7 @@ GameObject:
   - component: {fileID: 4481781362664954739}
   - component: {fileID: 1398643983393180625}
   m_Layer: 0
-  m_Name: Block(kari)
+  m_Name: Block(kari) 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
