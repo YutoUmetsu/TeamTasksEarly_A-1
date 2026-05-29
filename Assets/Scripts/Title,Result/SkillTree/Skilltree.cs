@@ -10,6 +10,7 @@ public class Skilltree : MonoBehaviour
 
     [Header("スキルデータ")]
 
+    public SkillType skillType;
     public string SkillName;
     public bool UnlokkedSkill; //取得済みスキル
     public bool AvailobleSkill = false;//取得可能スキル
@@ -28,6 +29,8 @@ public class Skilltree : MonoBehaviour
 
     public void UnlockSkilltree(SkillTreeManager manager)
     {
+        //if (CoinManager.Instance.TrySpendCoins(Cost)) {
+
         if (UnlokkedSkill) return; //すでに取得済み
 
         if (!AvailobleSkill) return;  //取得不可
@@ -69,7 +72,7 @@ public class Skilltree : MonoBehaviour
         {
             ButtonImage.color = new Color(0.4f, 0.4f, 0.4f);
         }
-        if (UnlokkedSkill)//解放済みの色
+        else if (UnlokkedSkill)//解放済みの色
         {
             ButtonImage.color = Color.yellow;
         }
