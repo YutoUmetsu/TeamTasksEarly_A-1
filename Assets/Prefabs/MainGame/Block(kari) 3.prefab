@@ -292,7 +292,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FallObject
   toYPos: 0
-  maxHp: 1
+  maxHp: 6
 --- !u!114 &1398643983393180625
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -305,7 +305,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9d420d0d84c73243b0a8d535cab032c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DestructibleBlock
-  coinRewardAmount: 1
-  coinVisualPrefab: {fileID: 3075023401187976702, guid: 6deb466c594846d4cbb1cc55ace92dfe, type: 3}
+  coinRewardAmount: 6
+  coinVisualPrefab: {fileID: 1901812807532613576, guid: dd9c209d17a46a54e8fed828034054f6, type: 3}
   upwardForce: 5
   sideForce: 2

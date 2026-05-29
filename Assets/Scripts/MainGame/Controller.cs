@@ -15,6 +15,12 @@ public class Controller : MonoBehaviour
     [SerializeField] System.Collections.Generic.List<GameObject> bombPrefabs; // 爆弾プレハブのリスト
     [SerializeField] int bombSpawnCountPerTurn = 1; // 1ターンに落とす爆弾の固定数
 
+
+    [Header("確率で降ってくる新しいブロックの設定")]
+    [SerializeField] System.Collections.Generic.List<GameObject> rareBlockPrefabs; // 後ろにあるほど低確率
+    [Range(0f, 100f)]
+    [SerializeField] float rareBlockSpawnChance = 30f; // 通常以外のブロックのスポーン率
+
     enum GameState
     {
         None = 0,
@@ -206,7 +212,14 @@ public class Controller : MonoBehaviour
                             prefabToSpawn = bombPrefabs[randomBombType];
                         }
                     }
-
+                    // 爆弾じゃなかった場合、確率で新しいブロックを抽選する
+                    else if (rareBlockPrefabs != null && rareBlockPrefabs.Count > 0)
+                    {
+                        if (UnityEngine.Random.Range(0f, 100f) < rareBlockSpawnChance)
+                        {
+                            prefabToSpawn = GetRandomBlockWithWeight(rareBlockPrefabs);
+                        }
+                    }
                     // 通し番号を進める
                     currentSpawnGlobalIndex++;
 
@@ -335,5 +348,34 @@ public class Controller : MonoBehaviour
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// リストの後ろに登録されているオブジェクトほど確率が低くなるように抽選する関数
+    /// </summary>
+    private GameObject GetRandomBlockWithWeight(System.Collections.Generic.List<GameObject> blockList)
+    {
+        if (blockList == null || blockList.Count == 0) return fallPrefab;
+
+        int totalWeight = 0;
+        for (int i = 0; i < blockList.Count; i++)
+        {
+            totalWeight += (blockList.Count - i);
+        }
+
+        int randomValue = UnityEngine.Random.Range(0, totalWeight);
+        int currentWeightSum = 0;
+
+        for (int i = 0; i < blockList.Count; i++)
+        {
+            currentWeightSum += (blockList.Count - i);
+            if (randomValue < currentWeightSum)
+            {
+                if (blockList[i] != null) return blockList[i];
+                break;
+            }
+        }
+
+        return fallPrefab;
     }
 }
