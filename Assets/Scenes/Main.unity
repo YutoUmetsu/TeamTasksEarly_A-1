@@ -1174,7 +1174,7 @@ PrefabInstance:
     - target: {fileID: 7798412970323934775, guid: f09a74cafabe77a4ebe10232045094f8, type: 3}
       propertyPath: 'stockItems.Array.data[0]'
       value: 
-      objectReference: {fileID: 7435417333485573945, guid: 77b5a6505d84bbe4e8cb3b6212a1e9b5, type: 3}
+      objectReference: {fileID: 1921311403435733837, guid: f7d2c0347d3ed2f45bb0762408527ffc, type: 3}
     - target: {fileID: 7798412970323934775, guid: f09a74cafabe77a4ebe10232045094f8, type: 3}
       propertyPath: 'stockItems.Array.data[1]'
       value: 
