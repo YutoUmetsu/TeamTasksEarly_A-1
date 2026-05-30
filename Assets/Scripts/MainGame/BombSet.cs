@@ -74,7 +74,7 @@ public class BombSet : MonoBehaviour
                 UnityEngine.UI.Image iconImage = iconObj.GetComponent<UnityEngine.UI.Image>();
                 if (iconImage != null)
                 {
-                    iconImage.sprite = bombScript.uiSprite;
+                    iconImage.sprite = bombScript.GetCurrentUiSprite();
                 }
             }
         }
