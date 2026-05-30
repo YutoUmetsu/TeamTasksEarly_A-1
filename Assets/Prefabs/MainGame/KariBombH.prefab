@@ -110,7 +110,7 @@ PrefabInstance:
     - target: {fileID: 374906128410911625, guid: cd9b77be4e68e12419c7119880dcd439, type: 3}
       propertyPath: uiSprite
       value: 
-      objectReference: {fileID: -8670142627708721567, guid: fbf8101c8373f2948bf22ae36ce63192, type: 3}
+      objectReference: {fileID: 5723548292355136415, guid: 978ef803031050243826c2fb55c7c4a2, type: 3}
     - target: {fileID: 2140071974557913961, guid: cd9b77be4e68e12419c7119880dcd439, type: 3}
       propertyPath: m_Name
       value: KariBombH

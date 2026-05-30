@@ -50,7 +50,21 @@ public class BombSet : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        for (int i = 0; i < stockItems.Count; i++)
+        // ボーナス込みの「全体の最大設置数」を計算
+        int currentMaxBombs = maxPlaceableBombs;
+        if (BombInventoryManager.Instance != null)
+        {
+            currentMaxBombs += BombInventoryManager.Instance.bonusMaxBombs;
+        }
+
+        // 【修正】純粋に「全体の最大数」から「今までに置いた総数」を引き算する
+        int remainingCount = currentMaxBombs - totalPlacedCount;
+        if (remainingCount < 0) remainingCount = 0;
+
+        // ストックにある数か、残り数の少ない方を表示
+        int displayCount = Mathf.Min(stockItems.Count, remainingCount);
+
+        for (int i = 0; i < displayCount; i++)
         {
             GameObject iconObj = Instantiate(uiIconPrefab, uiStockContainer);
             Bomb bombScript = stockItems[i].GetComponent<Bomb>();
@@ -58,7 +72,6 @@ public class BombSet : MonoBehaviour
             if (bombScript != null && bombScript.uiSprite != null)
             {
                 UnityEngine.UI.Image iconImage = iconObj.GetComponent<UnityEngine.UI.Image>();
-
                 if (iconImage != null)
                 {
                     iconImage.sprite = bombScript.uiSprite;
@@ -66,7 +79,6 @@ public class BombSet : MonoBehaviour
             }
         }
     }
-
     void CheckAndPlace()
     {
         Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -176,5 +188,10 @@ public class BombSet : MonoBehaviour
     {
         isLocked = false;
         Debug.Log("爆弾の設置ロックを解除しました。");
+    }
+
+    public void OnExplodeResetUI()
+    {
+        RefreshStockUI();
     }
 }
