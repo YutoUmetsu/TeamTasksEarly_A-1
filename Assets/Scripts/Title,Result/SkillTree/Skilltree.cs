@@ -3,21 +3,26 @@ using System;
 using TMPro;
 using System.Collections.Generic; // 必須！
 using UnityEngine.UI;
+using Unity.VisualScripting;
 
 public class Skilltree : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
     [Header("スキルデータ")]
+    [Header("スキル説明")]
+    [TextArea]
 
     public SkillType skillType;
     public string SkillName;
+    public string SkillDescription;//スキル説明
     public bool UnlokkedSkill; //取得済みスキル
     public bool AvailobleSkill = false;//取得可能スキル
 
     public int Cost = 1; //コスト追加
     public List<Skilltree> NextSkill;//次のスキル
     [SerializeField] SkillTreeManager manager;
+    [SerializeField] private SkillUI skillUI;
 
     Image ButtonImage;
 
@@ -103,9 +108,11 @@ public class Skilltree : MonoBehaviour
 
     }
 
-
-
-
+    public void OnClickSkill()
+    {
+        Debug.Log(SkillName);
+        skillUI.SelectSkill(this);
+    }
 
     void Start()
     {
