@@ -67,21 +67,23 @@ public class MakeSwitch : MonoBehaviour
 
         if (bombSet != null)
         {
-            // もし今回の起爆が「最後の最大数」に達しているなら、シーン遷移ルートへ
-            if (totalExplodeCount >= bombSet.maxPlaceableBombs)
+            bombSet.OnExplodeResetUI();
+            // ─── 【修正：ここでもボーナス込みの本当の最大数を計算する】 ───
+            int currentMaxBombs = bombSet.maxPlaceableBombs;
+            if (BombInventoryManager.Instance != null)
+            {
+                currentMaxBombs += BombInventoryManager.Instance.bonusMaxBombs;
+            }
+
+            // 修正した本当の最大数と比較する！
+            if (totalExplodeCount >= currentMaxBombs)
             {
                 StartCoroutine(WaitForFallAndChangeScene());
             }
-            // まだ上限に達していないなら、パズル続行（落下完了を待ってから次の設置ロックを解除）
             else
             {
                 StartCoroutine(WaitForFallAndUnlockNextBomb());
             }
-        }
-        else
-        {
-            // 万が一BombSetが見つからない場合の安全策
-            StartCoroutine(WaitForFallAndChangeScene());
         }
     }
 
