@@ -170,7 +170,7 @@ PrefabInstance:
     - target: {fileID: 5766869815665447289, guid: b9f9ff2fe3e22004aaeacf941f4d1a8b, type: 3}
       propertyPath: uiSprite
       value: 
-      objectReference: {fileID: -1680013010550609027, guid: 7e8ce7b5a35dbb44b9dac459a5646741, type: 3}
+      objectReference: {fileID: 6931432659183118860, guid: eb886a0795c50504e8980a418233f3bc, type: 3}
     - target: {fileID: 6152057092409105914, guid: b9f9ff2fe3e22004aaeacf941f4d1a8b, type: 3}
       propertyPath: targetNames.Array.size
       value: 1
