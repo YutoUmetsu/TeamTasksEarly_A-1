@@ -171,6 +171,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dbda1996849b5a42b82b76323da91f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Skilltree
+  skillType: 0
   SkillName: 
   UnlokkedSkill: 0
   AvailobleSkill: 1
@@ -418,6 +419,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dbda1996849b5a42b82b76323da91f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Skilltree
+  skillType: 0
   SkillName: 
   UnlokkedSkill: 0
   AvailobleSkill: 0

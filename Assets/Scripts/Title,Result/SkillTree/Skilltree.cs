@@ -29,9 +29,56 @@ public class Skilltree : MonoBehaviour
 
     public void UnlockSkilltree(SkillTreeManager manager)
     {
-        //if (CoinManager.Instance.TrySpendCoins(Cost)) {
+       /* if (CoinManager.Instance.TrySpendCoins(Cost)) {
+            switch (skillType)
+            {
+                // 名前が「Damage」から始まっている場合の処理（T1～T7共通）
+                case var _ when skillType.ToString().StartsWith("Damage"):
+                    Debug.Log("ダメージ系のスキルが解放されました！");
+                    // ここにダメージアップの共通処理を書く
+                    break;
 
-        if (UnlokkedSkill) return; //すでに取得済み
+                //レンジだけは個別に1個ずつ書く
+                case SkillType.RangeT1:
+                    Debug.Log("範囲T1のスキルが解放されました！");
+                    break;
+                case SkillType.RangeT2:
+                    Debug.Log("範囲T2のスキルが解放されました！");
+                    break;
+                case SkillType.RangeT3:
+                    Debug.Log("範囲T3のスキルが解放されました！");
+                    break;
+                case SkillType.RangeT4:
+                    Debug.Log("範囲T4のスキルが解放されました！");
+                    break;
+                case SkillType.RangeT5:
+                    Debug.Log("範囲T5のスキルが解放されました！");
+                    break;
+                case SkillType.RangeT6:
+                    Debug.Log("範囲T6のスキルが解放されました！");
+                    break;
+                case SkillType.RangeT7:
+                    Debug.Log("範囲T7のスキルが解放されました！");
+                    break;
+
+                // 名前が「Result」から始まっている場合の処理（T1～T7共通）
+                case var _ when skillType.ToString().StartsWith("Result"):
+                    Debug.Log("リザルト系のスキルが解放されました！");
+                    break;
+
+                //名前が「Combo」から始まっている場合の処理（T1～T7共通）
+                case var _ when skillType.ToString().StartsWith("Combo"):
+                    Debug.Log("コンボ系のスキルが解放されました！");
+                    break;
+
+                // どれにも当てはまらない場合（エラー除け）
+                default:
+                    Debug.Log("設定されていない、あるいは用意されてません！");
+                    break;
+            }*/
+
+
+            if (UnlokkedSkill) return; //すでに取得済み
 
         if (!AvailobleSkill) return;  //取得不可
 
