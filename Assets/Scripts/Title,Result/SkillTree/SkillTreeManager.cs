@@ -48,6 +48,20 @@ public class SkillTreeManager : MonoBehaviour
     }
     void Start()
     {
+        Debug.Log(CenterSkill);
+
+        if (CenterSkill == null)
+        {
+            Debug.LogError("CenterSkill‚ª–¢İ’è");
+            return;
+        }
+
+        if (pointsText == null)
+        {
+            Debug.LogError("pointsText‚ª–¢İ’è");
+            return;
+        }
+
         CenterSkill.AvailobleSkill = true;
         UpdatePointText();
     }
