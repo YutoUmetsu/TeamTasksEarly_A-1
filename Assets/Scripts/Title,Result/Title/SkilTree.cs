@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class NewMonoBehaviourScript : MonoBehaviour
 {
@@ -23,5 +24,6 @@ public class NewMonoBehaviourScript : MonoBehaviour
     public void OnClick()
     {
         Debug.Log("skiltree");
+        SceneManager.LoadScene("SkillTree");
     }
 }

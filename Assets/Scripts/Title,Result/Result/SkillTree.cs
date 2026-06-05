@@ -1,21 +1,29 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SkillTree : MonoBehaviour
 {
+    public int a;
+    private int b;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
+    }
+    public void A()
+    {
+
     }
 
     public void OnClick()
     {
-        Debug.Log("Skiltree");
+        Debug.Log("skiltree");
+        SceneManager.LoadScene("SkillTree");
     }
 }
