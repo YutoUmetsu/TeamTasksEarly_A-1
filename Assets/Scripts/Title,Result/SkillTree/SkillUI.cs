@@ -20,7 +20,7 @@ public class SkillUI : MonoBehaviour
         Debug.Log(skill.SkillName);
         SkillNameText.text = skill.SkillName;
 
-        CostText.text = "Cost : " + skill.Cost;
+        CostText.text = skill.Cost + "                 ‰ð•ú";
 
         UnlockButton.interactable = skill.AvailobleSkill && !skill.UnlokkedSkill && manager.CostPoint >= skill.Cost;
     }

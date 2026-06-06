@@ -24,7 +24,10 @@ public class Skilltree : MonoBehaviour
     [SerializeField] SkillTreeManager manager;
     [SerializeField] private SkillUI skillUI;
 
-    Image ButtonImage;
+    [SerializeField] private Image ButtonImage;
+
+    [SerializeField] private Sprite UnlokkedSprite;
+    [SerializeField] private Sprite AvailobleSprite;
 
 
     //void Initializetree(Skilltree center) //中心のスキルのみ取得可能
@@ -145,15 +148,17 @@ public class Skilltree : MonoBehaviour
     {
         if (!UnlokkedSkill&&!AvailobleSkill)
         {
-            ButtonImage.color = new Color(0.4f, 0.4f, 0.4f);
+            //ButtonImage.color = new Color(0.4f, 0.4f, 0.4f);
         }
         else if (UnlokkedSkill)//解放済みの色
         {
-            ButtonImage.color = Color.yellow;
+            //ButtonImage.color = Color.yellow;
+            ButtonImage.sprite = UnlokkedSprite;
         }
         else if (AvailobleSkill)//開放可能
         {
-            ButtonImage.color = Color.red;//new Color(1f, 0.9f, 0.2f);
+            //ButtonImage.color = Color.red;//new Color(1f, 0.9f, 0.2f);
+            ButtonImage.sprite = AvailobleSprite;
         }
     }
 
