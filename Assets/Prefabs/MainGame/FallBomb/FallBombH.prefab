@@ -806,6 +806,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: -8670142627708721567, guid: fbf8101c8373f2948bf22ae36ce63192, type: 3}
     - target: {fileID: 374906128410911625, guid: cd9b77be4e68e12419c7119880dcd439, type: 3}
+      propertyPath: baseDamage
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 374906128410911625, guid: cd9b77be4e68e12419c7119880dcd439, type: 3}
       propertyPath: extraBlastT1
       value: 
       objectReference: {fileID: 68412438336832200}

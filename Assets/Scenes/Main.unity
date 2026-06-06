@@ -154,7 +154,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 411.2, y: -86.2}
+  m_AnchoredPosition: {x: 191, y: -86.2}
   m_SizeDelta: {x: 316.5, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &4016816
@@ -1164,6 +1164,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 648440385}
     - target: {fileID: 7798412970323934775, guid: f09a74cafabe77a4ebe10232045094f8, type: 3}
+      propertyPath: maxPlaceableBombs
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7798412970323934775, guid: f09a74cafabe77a4ebe10232045094f8, type: 3}
       propertyPath: stockItems.Array.size
       value: 5
       objectReference: {fileID: 0}
@@ -1293,19 +1297,27 @@ PrefabInstance:
       objectReference: {fileID: 1908106306}
     - target: {fileID: 8983576289099948456, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
       propertyPath: fallTime
-      value: 0.3
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 8983576289099948456, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
       propertyPath: boardSize
-      value: 5
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8983576289099948456, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
       propertyPath: fallPrefab
       value: 
       objectReference: {fileID: 3468364833027856995, guid: dbaf3b5e54a75ed48924439df5043e96, type: 3}
     - target: {fileID: 8983576289099948456, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
+      propertyPath: bomdSpawnParcent
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983576289099948456, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
       propertyPath: rareBlockSpawnChance
       value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983576289099948456, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
+      propertyPath: bombSpawnCountPerTurn
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 8983576289099948456, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
       propertyPath: bombPrefabs.Array.size
