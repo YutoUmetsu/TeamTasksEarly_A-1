@@ -292,7 +292,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FallObject
   toYPos: 0
-  maxHp: 9
+  maxHp: 11
 --- !u!114 &1398643983393180625
 MonoBehaviour:
   m_ObjectHideFlags: 0

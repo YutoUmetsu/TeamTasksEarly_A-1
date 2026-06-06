@@ -14,6 +14,7 @@ public class Controller : MonoBehaviour
     [Header("爆弾補充の設定")]
     [SerializeField] System.Collections.Generic.List<GameObject> bombPrefabs; // 爆弾プレハブのリスト
     [SerializeField] int bombSpawnCountPerTurn = 1; // 1ターンに落とす爆弾の固定数
+    [SerializeField] float bomdSpawnParcent = 15f;//   爆弾の落下確率（１５～３５％、スキルで変動）
 
 
     [Header("確率で降ってくる新しいブロックの設定")]
@@ -203,7 +204,7 @@ public class Controller : MonoBehaviour
                     GameObject prefabToSpawn = fallPrefab; // 基本は通常ブロック
 
                     // もし今回の通し番号が「爆弾の当選くじ」に含まれていて、かつ爆弾リストに中身があれば
-                    if (bombSelectionIndices.Contains(currentSpawnGlobalIndex) && bombPrefabs != null && bombPrefabs.Count > 0)
+                    if (bombSelectionIndices.Contains(currentSpawnGlobalIndex) && bombPrefabs != null && bombPrefabs.Count > 0 && UnityEngine.Random.Range(0f, 100f) < bomdSpawnParcent)
                     {
                         // 爆弾リストの中からランダムに1種類選ぶ
                         int randomBombType = UnityEngine.Random.Range(0, bombPrefabs.Count);
