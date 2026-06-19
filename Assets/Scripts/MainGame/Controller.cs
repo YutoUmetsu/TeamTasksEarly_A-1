@@ -12,15 +12,13 @@ public class Controller : MonoBehaviour
     float objHalfWidth;
 
     [Header("爆弾補充の設定")]
-    [SerializeField] System.Collections.Generic.List<GameObject> bombPrefabs; // 爆弾プレハブのリスト
-    [SerializeField] int bombSpawnCountPerTurn = 1; // 1ターンに落とす爆弾の固定数
-    [SerializeField] float bomdSpawnParcent = 15f;//   爆弾の落下確率（１５～３５％、スキルで変動）
-
+    [SerializeField] System.Collections.Generic.List<GameObject> bombPrefabs;
+    [SerializeField] float bomdSpawnParcent = 15f; // 基本の確率（15～35%）
 
     [Header("確率で降ってくる新しいブロックの設定")]
-    [SerializeField] System.Collections.Generic.List<GameObject> rareBlockPrefabs; // 後ろにあるほど低確率
+    [SerializeField] System.Collections.Generic.List<GameObject> rareBlockPrefabs;
     [Range(0f, 100f)]
-    [SerializeField] float rareBlockSpawnChance = 30f; // 通常以外のブロックのスポーン率
+    [SerializeField] float rareBlockSpawnChance = 30f;
 
     enum GameState
     {
@@ -37,6 +35,9 @@ public class Controller : MonoBehaviour
 
     [System.NonSerialized] public bool isBombPlacedThisFrame = false;
     private BombSet bombSet;
+
+    // コインのカウント用変数
+    private int activeCoinCount = 0;
 
     void Start()
     {
@@ -65,8 +66,6 @@ public class Controller : MonoBehaviour
 
                 GameObject g = Instantiate(fallPrefab, spawnPos, Quaternion.identity);
                 fallObjects[x, y] = g.GetComponent<FallObject>();
-
-                // 引数を2つ（状態、初期のYマス目）渡す形に連動させました
                 fallObjects[x, y].StartUpFallObject(BlockState.Normal, y);
 
                 if (bombSet != null)
@@ -120,49 +119,19 @@ public class Controller : MonoBehaviour
 
     void CalculateFallTargets()
     {
-        // --- 1. 今回のターンで「全体で何個のブロックが補充されるか」をあらかじめ計算する ---
-        int totalNewBlocksCount = 0;
-        for (int x = 0; x < boardSize; x++)
-        {
-            for (int y = 0; y < boardSize; y++)
-            {
-                if (fallObjects[x, y] == null || fallObjects[x, y].state == BlockState.Delete || fallObjects[x, y].state == BlockState.Empty)
-                {
-                    totalNewBlocksCount++;
-                }
-            }
-        }
-
-        // --- 2. 爆弾を落とす場所（当選インデックス）をランダムに決定する ---
-        System.Collections.Generic.HashSet<int> bombSelectionIndices = new System.Collections.Generic.HashSet<int>();
-
-        // インスペクターの基本設定値に、新しいマネージャーのボーナス値を加算する
-        int currentTurnBombCount = bombSpawnCountPerTurn;
+        // マネージャーからボーナス確率を取得して、基本確率にプラスする
+        float finalSpawnPercent = bomdSpawnParcent;
         if (BombSpawnManager.Instance != null)
         {
-            currentTurnBombCount += BombSpawnManager.Instance.bonusSpawnBombs;
+            finalSpawnPercent += BombSpawnManager.Instance.bonusBombPercent;
         }
 
-        // 補充総数より設定された爆弾数(n)が多い場合は、補充総数を上限にする
-        int actualBombCountToSpawn = Mathf.Min(currentTurnBombCount, totalNewBlocksCount);
-       
-        // 重複のないランダムな「くじ（0 ～ 補充総数-1）」を作成
-        while (bombSelectionIndices.Count < actualBombCountToSpawn)
-        {
-            int randomIndex = UnityEngine.Random.Range(0, totalNewBlocksCount);
-            bombSelectionIndices.Add(randomIndex);
-        }
-
-        // 全体の補充ブロックに通し番号をつけるためのカウンター
-        int currentSpawnGlobalIndex = 0;
-
-
-        // --- 3. ここから各列の落下・補充のメイン計算 ---
+        // 各列の落下・補充の計算
         for (int x = 0; x < boardSize; x++)
         {
             int emptyCount = 0;
 
-            // 既存ブロックの落下ターゲット計算
+            // 既存ブロックの落下位置を計算
             for (int y = 0; y < boardSize; y++)
             {
                 if (fallObjects[x, y] == null)
@@ -190,7 +159,7 @@ public class Controller : MonoBehaviour
                 }
             }
 
-            // この列に空き地（emptyCount）があれば上から補充
+            // 空きがあるなら、上から確率に基づいて補充
             if (emptyCount > 0)
             {
                 int arrayYPointer = 0;
@@ -200,20 +169,18 @@ public class Controller : MonoBehaviour
                     int spawnYIndex = boardSize + i;
                     Vector2 spawnPos = startPos + new Vector2(x, spawnYIndex);
 
-                    // ─── 【重要：ここで通常ブロックか爆弾かを判定！】 ───
-                    GameObject prefabToSpawn = fallPrefab; // 基本は通常ブロック
+                    GameObject prefabToSpawn = fallPrefab; // デフォルトは通常ブロック
 
-                    // もし今回の通し番号が「爆弾の当選くじ」に含まれていて、かつ爆弾リストに中身があれば
-                    if (bombSelectionIndices.Contains(currentSpawnGlobalIndex) && bombPrefabs != null && bombPrefabs.Count > 0 && UnityEngine.Random.Range(0f, 100f) < bomdSpawnParcent)
+                    // 合算した最終確率（基本＋スキルボーナス）で毎マス抽選
+                    if (bombPrefabs != null && bombPrefabs.Count > 0 && UnityEngine.Random.Range(0f, 100f) < finalSpawnPercent)
                     {
-                        // 爆弾リストの中からランダムに1種類選ぶ
                         int randomBombType = UnityEngine.Random.Range(0, bombPrefabs.Count);
                         if (bombPrefabs[randomBombType] != null)
                         {
                             prefabToSpawn = bombPrefabs[randomBombType];
                         }
                     }
-                    // 爆弾じゃなかった場合、確率で新しいブロックを抽選する
+                    // 爆弾をすり抜けたら、次にレアブロックの確率抽選を踏む
                     else if (rareBlockPrefabs != null && rareBlockPrefabs.Count > 0)
                     {
                         if (UnityEngine.Random.Range(0f, 100f) < rareBlockSpawnChance)
@@ -221,10 +188,7 @@ public class Controller : MonoBehaviour
                             prefabToSpawn = GetRandomBlockWithWeight(rareBlockPrefabs);
                         }
                     }
-                    // 通し番号を進める
-                    currentSpawnGlobalIndex++;
 
-                    // 決定したプレハブ（通常 or 爆弾）を生成！
                     GameObject newBlock = Instantiate(prefabToSpawn, spawnPos, Quaternion.identity);
                     FallObject fallObj = newBlock.GetComponent<FallObject>();
 
@@ -236,7 +200,6 @@ public class Controller : MonoBehaviour
 
                     if (bombSet != null) bombSet.RegisterTarget(newBlock);
 
-                    // 配列への一時キープ
                     while (arrayYPointer < boardSize)
                     {
                         if (fallObjects[x, arrayYPointer] == null ||
@@ -258,6 +221,12 @@ public class Controller : MonoBehaviour
 
     void FallUpdate()
     {
+        // 画面内にコインが出ている間は、ブロックの落下開始をその場でストップ
+        if (activeCoinCount > 0)
+        {
+            return;
+        }
+
         bool anyBlockMoving = false;
 
         for (int x = 0; x < boardSize; x++)
@@ -311,7 +280,6 @@ public class Controller : MonoBehaviour
             {
                 if (fallObjects[x, y] == null) continue;
 
-                // 引き算を消去！純粋なインデックスで配列を再構築します
                 int trueY = fallObjects[x, y].PosY();
 
                 if (trueY >= 0 && trueY < boardSize)
@@ -340,6 +308,12 @@ public class Controller : MonoBehaviour
             if (db.coinVisualPrefab != null)
             {
                 GameObject spawnedCoin = Instantiate(db.coinVisualPrefab, db.transform.position, Quaternion.identity);
+
+                CoinDestroyNotifier notifier = spawnedCoin.AddComponent<CoinDestroyNotifier>();
+                notifier.Setup(this);
+
+                activeCoinCount++;
+
                 Rigidbody2D coinRb = spawnedCoin.GetComponent<Rigidbody2D>();
                 if (coinRb != null)
                 {
@@ -351,9 +325,11 @@ public class Controller : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// リストの後ろに登録されているオブジェクトほど確率が低くなるように抽選する関数
-    /// </summary>
+    public void DecrementCoinCount()
+    {
+        activeCoinCount--;
+    }
+
     private GameObject GetRandomBlockWithWeight(System.Collections.Generic.List<GameObject> blockList)
     {
         if (blockList == null || blockList.Count == 0) return fallPrefab;

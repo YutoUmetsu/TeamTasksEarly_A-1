@@ -5,8 +5,8 @@ public class BombSpawnManager : MonoBehaviour
     // どこからでも「BombSpawnManager.Instance」でアクセスできるようにする
     public static BombSpawnManager Instance { get; private set; }
 
-    [Header("スキルツリーで増えた『降ってくる爆弾数』のボーナス値")]
-    public int bonusSpawnBombs = 0;
+    [Header("スキルツリーで増えた『爆弾ドロップ確率』のボーナス値（％）")]
+    public float bonusBombPercent = 0f; // 【変更】個数から確率（%）に変更
 
     private void Awake()
     {
@@ -22,10 +22,10 @@ public class BombSpawnManager : MonoBehaviour
         }
     }
 
-    // スキル解放やアイテムを拾った時に、降ってくる数を増やす関数
-    public void IncreaseSpawnBombs(int amount)
+    // スキル解放やアイテムを拾った時に、降ってくる確率を増やす関数
+    public void IncreaseSpawnBombs(float amount) // 【変更】引数もfloat（％）に
     {
-        bonusSpawnBombs += amount;
-        Debug.Log($"降ってくる爆弾の補充数ボーナスが +{amount} されました！ 現在のボーナス: {bonusSpawnBombs}");
+        bonusBombPercent += amount;
+        Debug.Log($"爆弾のドロップ確率ボーナスが +{amount}% されました！ 現在のボーナス: {bonusBombPercent}%");
     }
 }
