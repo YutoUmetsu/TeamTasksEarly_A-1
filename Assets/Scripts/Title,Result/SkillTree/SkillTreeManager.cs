@@ -1,13 +1,18 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SkillTreeManager : MonoBehaviour
 {
     public int CostPoint = 0;
+    public Button PrestigeButton;
     public Skilltree CenterSkill;
     public TMP_Text pointsText;
+    public List<Skilltree> AllSkills;
 
     [SerializeField] Skill skill;
+    [SerializeField] SkillTree skilltree;
     public void ApplySkill(SkillType type)//能力反映処理
     {
         switch (type)
@@ -46,6 +51,37 @@ public class SkillTreeManager : MonoBehaviour
 
         }
     }
+
+    //全取得チェック
+    public bool IsAllSkillUnlocked()
+    {
+        foreach (var skill in AllSkills)
+        {
+            if (!skill.UnlokkedSkill)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+    //リセット処理
+    public void Prestige()
+    {
+        foreach (var skill in AllSkills)
+        {
+            skill.UnlokkedSkill = false;
+            skill.AvailobleSkill = false;
+            skill.SetStartSprite();
+        }
+
+        CenterSkill.AvailobleSkill = true;
+
+        Debug.Log("スキルツリーをリセット");
+    }
+
     void Start()
     {
         Debug.Log(CenterSkill);
@@ -64,6 +100,20 @@ public class SkillTreeManager : MonoBehaviour
 
         CenterSkill.AvailobleSkill = true;
         UpdatePointText();
+    }
+
+    void Update()
+    {
+        if (IsAllSkillUnlocked())
+        {
+            //PrestigeButton.image.color = Color.green;
+            PrestigeButton.interactable = true;
+        }
+        else
+        {
+            //PrestigeButton.image.color = Color.gray;
+            PrestigeButton.interactable = false;
+        }
     }
 
     public void UpdatePointText()//UI更新専用の関数
