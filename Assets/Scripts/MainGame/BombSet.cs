@@ -22,7 +22,6 @@ public class BombSet : MonoBehaviour
     [Header("UI：縦に並べたい爆弾アイコンのプレハブ")]
     [SerializeField] private GameObject uiIconPrefab;
 
-    // 1個設置した後に次の入力を受け付けないためのロック用フラグ
     private bool isLocked = false;
 
     void Start()
@@ -30,16 +29,6 @@ public class BombSet : MonoBehaviour
         RefreshStockUI();
     }
 
-    void Update()
-    {
-        // ロックされている場合はクリック判定自体を行わない
-        if (isLocked) return;
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            CheckAndPlace();
-        }
-    }
 
     public void RefreshStockUI()
     {
@@ -50,18 +39,15 @@ public class BombSet : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        // ボーナス込みの「全体の最大設置数」を計算
         int currentMaxBombs = maxPlaceableBombs;
         if (BombInventoryManager.Instance != null)
         {
             currentMaxBombs += BombInventoryManager.Instance.bonusMaxBombs;
         }
 
-        // 【修正】純粋に「全体の最大数」から「今までに置いた総数」を引き算する
         int remainingCount = currentMaxBombs - totalPlacedCount;
         if (remainingCount < 0) remainingCount = 0;
 
-        // ストックにある数か、残り数の少ない方を表示
         int displayCount = Mathf.Min(stockItems.Count, remainingCount);
 
         for (int i = 0; i < displayCount; i++)
@@ -77,12 +63,41 @@ public class BombSet : MonoBehaviour
                     iconImage.sprite = bombScript.GetCurrentUiSprite();
                 }
             }
+
+            // 生成したUIにドラッグ管理コンポーネントをつけて初期化する
+            BombUIDragHandler dragHandler = iconObj.GetComponent<BombUIDragHandler>();
+            if (dragHandler == null) dragHandler = iconObj.AddComponent<BombUIDragHandler>();
+
+            // 画面上にすでに手動設置された爆弾があるかチェック
+            bool hasAnyPlacedBomb = false;
+            foreach (GameObject block in targetItems)
+            {
+                if (block == null) continue;
+                Bomb[] bombs = block.GetComponentsInChildren<Bomb>();
+                foreach (Bomb b in bombs)
+                {
+                    if (b.gameObject != block)
+                    {
+                        hasAnyPlacedBomb = true;
+                        break;
+                    }
+                }
+                if (hasAnyPlacedBomb) break;
+            }
+
+            // 「リストの一番上（i == 0）」かつ「今設置ロックがかかっていない（!isLocked）」
+            // かつ「まだ画面に爆弾を1個も置いていない」時だけ新しくドラッグ可能にする！
+            bool canDragNow = (i == 0) && (!isLocked) && (!hasAnyPlacedBomb);
+
+            dragHandler.Setup(this, canDragNow);
         }
     }
-    void CheckAndPlace()
+
+    //ドラッグ＆ドロップでの設置・置き直し処理（完全修正版）
+    public bool TryPlaceFromDrag(Vector2 screenMousePosition)
     {
-        Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
+        Vector2 worldPos = Camera.main.ScreenToWorldPoint(screenMousePosition);
+        RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);
 
         if (hit.collider != null)
         {
@@ -90,58 +105,74 @@ public class BombSet : MonoBehaviour
 
             if (targetItems.Contains(clickedObj))
             {
-                // 1. クリックしたオブジェクト自体に「Bomb」コンポーネントがあるか調べる（降ってきた爆弾対策）
+                // 1. そのブロックにすでに「他の爆弾（最初から降ってきたやつ等）」がないか
                 bool isBombBlock = clickedObj.GetComponent<Bomb>() != null;
 
-                // 2. クリックしたオブジェクトの子供（孫以下も含めて全部）に「Bomb」があるか調べる
-                // ただし、自分自身に付いているものは除外するために、全検索から自分を引く
-                Bomb[] allBombs = clickedObj.GetComponentsInChildren<Bomb>();
-                bool hasPlacedBomb = false;
-
-                foreach (Bomb b in allBombs)
+                // 2. 画面上にすでに「プレイヤーが手動で置いた爆弾」があるか探す
+                Bomb alreadyPlacedBomb = null;
+                foreach (GameObject block in targetItems)
                 {
-                    // 見つかったBombが、自分自身のコンポーネントじゃない ＝ 手動で置いた子供の爆弾！
-                    if (b.gameObject != clickedObj)
+                    if (block == null) continue;
+                    Bomb[] bombs = block.GetComponentsInChildren<Bomb>();
+                    foreach (Bomb b in bombs)
                     {
-                        hasPlacedBomb = true;
-                        break;
+                        // ブロック自身ではなく、子供としてくっついている ＝ 手動で置いた爆弾
+                        if (b.gameObject != block)
+                        {
+                            alreadyPlacedBomb = b;
+                            break;
+                        }
                     }
+                    if (alreadyPlacedBomb != null) break;
                 }
 
-                // 「降ってきた爆弾ブロック」であるか、すでに「手動設置された爆弾」があればガード！
-                if (isBombBlock || hasPlacedBomb)
+                // 今ドロップした場所に、すでに自分が置いた爆弾があるならスルー
+                if (alreadyPlacedBomb != null && alreadyPlacedBomb.transform.parent == clickedObj.transform)
                 {
-                    Debug.Log("ここにはすでに爆弾が存在するか、設置されています！");
-                    return;
+                    return false;
                 }
 
-                // ─── 以下はそのまま ───
-                // シングルトンのボーナス値を足した「本当の最大設置数」を計算する
+                // 元々の爆弾ブロックの上には置けないガード
+                if (isBombBlock)
+                {
+                    Debug.Log("ここには設置できません！");
+                    return false;
+                }
+
+                // 枠数チェック
                 int currentMaxBombs = maxPlaceableBombs;
                 if (BombInventoryManager.Instance != null)
                 {
                     currentMaxBombs += BombInventoryManager.Instance.bonusMaxBombs;
                 }
 
-                // 計算した currentMaxBombs を使って条件チェック
-                if (stockItems.Count > 0 && totalPlacedCount < currentMaxBombs)
+                // ─── 設置、または置き直しの実行 ───
+                if (alreadyPlacedBomb != null)
                 {
-                    PlaceItemFromStock(clickedObj);
-                }
-                else
-                {
-                    FallObject fallObj = clickedObj.GetComponent<FallObject>();
-                    Controller controller = UnityEngine.Object.FindFirstObjectByType<Controller>();
+                    // すでに置いてある爆弾を、新しいブロックに引っ越し
+                    alreadyPlacedBomb.transform.position = clickedObj.transform.position;
+                    alreadyPlacedBomb.transform.SetParent(clickedObj.transform);
 
-                    if (fallObj != null && controller != null)
+                    Controller controller = UnityEngine.Object.FindFirstObjectByType<Controller>();
+                    if (controller != null)
                     {
-                        controller.PerformBlockDelete(fallObj);
+                        controller.isBombPlacedThisFrame = true;
                     }
+
+                    Debug.Log("爆弾を別の場所に置き直しました！");
+                    return true;
+                }
+                else if (stockItems.Count > 0 && totalPlacedCount < currentMaxBombs)
+                {
+                    // まだ画面に1個も置いてない場合
+                    PlaceItemFromStock(clickedObj);
+                    return true;
                 }
             }
         }
-    }
 
+        return false;
+    }
     void PlaceItemFromStock(GameObject targetBlock)
     {
         GameObject itemToPlace = stockItems[0];
@@ -155,24 +186,25 @@ public class BombSet : MonoBehaviour
             controller.isBombPlacedThisFrame = true;
         }
 
+        // リストから削除してUIを詰める
         stockItems.RemoveAt(0);
-        RefreshStockUI();
         totalPlacedCount++;
 
-        isLocked = true;
+        // 置いた時点ではまだロックをかけない
+        RefreshStockUI();
 
         if (makeSwitch != null)
         {
             makeSwitch.BombCount++;
         }
 
-        // ログ表示もシングルトンのボーナスを反映した最大数にする
-        int currentMaxBombs = maxPlaceableBombs;
-        if (BombInventoryManager.Instance != null)
-        {
-            currentMaxBombs += BombInventoryManager.Instance.bonusMaxBombs;
-        }
-        Debug.Log($"設置完了！ {totalPlacedCount}/{currentMaxBombs}個。次の起爆まで設置をロックします。");
+        Debug.Log($"設置完了！起爆ボタンを押すまで置き直しが可能です。");
+    }
+
+    // ロック状態を外から安全にチェックするための公開関数
+    public bool IsPlacementLocked()
+    {
+        return isLocked;
     }
 
     public void RegisterTarget(GameObject target)
@@ -183,10 +215,10 @@ public class BombSet : MonoBehaviour
         }
     }
 
-    // スイッチ側から呼び出して、次の設置を行えるようにロックを外すための関数
     public void UnlockPlacement()
     {
         isLocked = false;
+        RefreshStockUI(); // ロック解除された時にも念のためUIを再描画して一番上を掴めるようにする
         Debug.Log("爆弾の設置ロックを解除しました。");
     }
 
