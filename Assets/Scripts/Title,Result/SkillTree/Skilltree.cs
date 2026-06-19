@@ -28,7 +28,9 @@ public class Skilltree : MonoBehaviour
 
     [SerializeField] private Sprite UnlokkedSprite;
     [SerializeField] private Sprite AvailobleSprite;
+    [SerializeField] private Sprite StartSprite;
 
+    public static int SkillCount = 0;
 
     //void Initializetree(Skilltree center) //中心のスキルのみ取得可能
     //{
@@ -106,6 +108,7 @@ public class Skilltree : MonoBehaviour
         }
 
         Debug.Log("取得成功");
+        Debug.Log(SkillCount);
 
         if (UnlokkedSkill) return; //すでに取得済み
 
@@ -113,7 +116,7 @@ public class Skilltree : MonoBehaviour
 
         if(manager.CostPoint < Cost) return; //ポイント不足
 
-        manager.CostPoint -= Cost; //ポイント消費
+        manager.CostPoint -= SkillCountCalculation(); //ポイント消費
 
         UnlokkedSkill = true;
         AvailobleSkill = false;
@@ -136,6 +139,22 @@ public class Skilltree : MonoBehaviour
     {
         Debug.Log(SkillName);
         skillUI.SelectSkill(this);
+    }
+
+    public void GetSkillCount()
+    {
+        SkillCount++;
+    }
+
+    public int SkillCountCalculation()
+    {
+        return 2 * SkillCount * SkillCount + 4 * SkillCount;
+    }
+
+    public void SetStartSprite()
+    {
+        ButtonImage.sprite = StartSprite;
+        SkillCount = 0;
     }
 
     void Start()
