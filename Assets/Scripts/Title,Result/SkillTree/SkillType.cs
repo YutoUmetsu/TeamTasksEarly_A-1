@@ -2,39 +2,47 @@ using UnityEngine;
 
 public enum SkillType
 {
-    // 爆弾ダメージ
-    DamageT1,
-    DamageT2,
-    DamageT3,
-    DamageT4,
-    DamageT5,
-    DamageT6,
-    DamageT7,
+  //AboveSkill
+    bool ExprosionPower11;//爆発威力アップ
+    bool ResourceAmount11;//獲得リソースアップ
+    bool ExprosionPower12;
+    bool ExprosionHeightRange11;//「縦」爆発範囲増加
+    bool BombAppearanceRate11;//爆発出現率
+    bool ExprosionWidthRange11;//「横」爆発範囲増加
+    bool ExprosionXRange11;//「×」爆発範囲増加
+    //bool
+    bool ExprosionCrossRange11;//「十字」爆発範囲増加
 
-    // リザルト
-    ResultT1,
-    ResultT2,
-    ResultT3,
-    ResultT4,
-    ResultT5,
-    ResultT6,
-    ResultT7,
+    //UnderSkill
+    bool ExprosionPower21;
+    bool ResourceAmount21;
+    bool ExprosionPowee22;
+    bool ExprosionHeightRange21;
+    bool BombAppearanceRate21;
+    bool ExprosionWidthRange21;
+    bool ExprosionXRange21;
+    //bool
+    bool ExprosionCrossRange21;
 
-    // コンボ
-    ComboT1,
-    ComboT2,
-    ComboT3,
-    ComboT4,
-    ComboT5,
-    ComboT6,
-    ComboT7,
+    //RightSkill
+    bool ExprosionWidthRange31;
+    bool ResourceAmount31;
+    bool ExprosionPower31;
+    bool ExprosionHeightRange31;
+    bool BombAppearanceRate31;
+    bool ExprosionWidthRange32;
+    bool ExprosionXRange31;
+    bool StartBomb31;//初期保有爆弾数
+    bool ExprosionCrossRange31;
 
-    // 範囲
-    RangeT1,
-    RangeT2,
-    RangeT3,
-    RangeT4,
-    RangeT5,
-    RangeT6,
-    RangeT7
+    //LeftSkill
+    bool ExprosionHeightRange41;
+    bool ResourceAmount41;
+    bool ExprosionPower41;
+    bool ExprosionHeightRange42;
+    bool BombAppearanceRate41;
+    bool ExprosionWidthRange42;
+    bool ExprosionXRange41;
+    bool StartBomb41;
+    bool ExprosionCrossRange41;
 }
