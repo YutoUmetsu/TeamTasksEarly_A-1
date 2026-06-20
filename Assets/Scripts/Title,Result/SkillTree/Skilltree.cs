@@ -10,10 +10,11 @@ public class Skilltree : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
     [Header("スキルデータ")]
+    public SkillType skillType;
     [Header("スキル説明")]
     [TextArea]
 
-    public SkillType skillType;
+    
     public string SkillName;
     public string SkillDescription;//スキル説明
     public bool UnlokkedSkill; //取得済みスキル
