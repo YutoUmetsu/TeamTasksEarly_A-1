@@ -31,6 +31,8 @@ public class Skilltree : MonoBehaviour
     [SerializeField] private Sprite AvailobleSprite;
     [SerializeField] private Sprite StartSprite;
 
+    private float lastClickTime;
+    private float doubleClickTime = 0.3f;
     public static int SkillCount = 0;
 
     //void Initializetree(Skilltree center) //中心のスキルのみ取得可能
@@ -102,7 +104,7 @@ public class Skilltree : MonoBehaviour
             return;
         }
 
-        if (manager.CostPoint < Cost)
+        if (manager.CostPoint < SkillCountCalculation())
         {
             Debug.Log("ポイント不足");
             return;
@@ -115,7 +117,7 @@ public class Skilltree : MonoBehaviour
 
         if (!AvailobleSkill) return;  //取得不可
 
-        if(manager.CostPoint < Cost) return; //ポイント不足
+       // if(manager.CostPoint < Cost) return; //ポイント不足
 
         manager.CostPoint -= SkillCountCalculation(); //ポイント消費
 
@@ -138,8 +140,20 @@ public class Skilltree : MonoBehaviour
 
     public void OnClickSkill()
     {
-        Debug.Log(SkillName);
-        skillUI.SelectSkill(this);
+        if (Time.time - lastClickTime < doubleClickTime)
+        {
+            Debug.Log("ダブルクリック");
+
+            UnlockSkilltree(manager);
+        }
+        else
+        {
+            Debug.Log("シングルクリック");
+
+            skillUI.SelectSkill(this);
+        }
+
+        lastClickTime = Time.time;
     }
 
     public void GetSkillCount()
@@ -166,20 +180,29 @@ public class Skilltree : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!UnlokkedSkill&&!AvailobleSkill)
+        if (UnlokkedSkill)//解放済みの色
         {
-            //ButtonImage.color = new Color(0.4f, 0.4f, 0.4f);
-        }
-        else if (UnlokkedSkill)//解放済みの色
-        {
-            //ButtonImage.color = Color.yellow;
             ButtonImage.sprite = UnlokkedSprite;
         }
         else if (AvailobleSkill)//開放可能
         {
-            //ButtonImage.color = Color.red;//new Color(1f, 0.9f, 0.2f);
-            ButtonImage.sprite = AvailobleSprite;
+            // ポイントが足りる
+            if (manager.CostPoint >= SkillCountCalculation())
+            {
+                ButtonImage.sprite = AvailobleSprite;
+            }
+            // ポイント不足
+            else
+            {
+                ButtonImage.sprite = StartSprite;
+            }
         }
+        else
+        {
+            ButtonImage.sprite = StartSprite;
+        }
+
+     
     }
 
     //スキルツリーメーカー参照
