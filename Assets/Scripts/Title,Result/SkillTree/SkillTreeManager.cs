@@ -15,41 +15,41 @@ public class SkillTreeManager : MonoBehaviour
     [SerializeField] SkillTree skilltree;
     public void ApplySkill(SkillType type)//能力反映処理
     {
-        switch (type)
-        {
-            case SkillType.DamageT1:
-            skill.DamageT1 = true;
+        //switch (type)
+        //{
+            //case SkillType.DamageT1:
+            //skill.DamageT1 = true;
 
-            break;
+            //break;
 
-            case SkillType.DamageT2:
-            skill.DamageT2 = true;
+            //case SkillType.DamageT2:
+            //skill.DamageT2 = true;
 
-            break;
+            //break;
 
-            case SkillType.DamageT3:
-            skill.DamageT3= true;
-             break;
+            //case SkillType.DamageT3:
+            //skill.DamageT3= true;
+            // break;
 
-             case SkillType.DamageT4:    
-              skill.DamageT4 = true;
-              break;
+            // case SkillType.DamageT4:    
+            //  skill.DamageT4 = true;
+            //  break;
 
-            case SkillType.DamageT5:
-                skill.DamageT5 = true;
-                break;
+            //case SkillType.DamageT5:
+            //    skill.DamageT5 = true;
+            //    break;
 
-            case SkillType.DamageT6:
-                skill.DamageT6= true;
-                break;
+            //case SkillType.DamageT6:
+            //    skill.DamageT6= true;
+            //    break;
 
-            case SkillType.DamageT7:
-                skill.DamageT7 = true;
-                break;
+            //case SkillType.DamageT7:
+            //    skill.DamageT7 = true;
+            //    break;
 
 
 
-        }
+       // }
     }
 
     //全取得チェック
