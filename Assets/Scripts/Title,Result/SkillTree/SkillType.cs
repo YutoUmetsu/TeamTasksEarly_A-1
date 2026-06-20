@@ -2,47 +2,47 @@ using UnityEngine;
 
 public enum SkillType
 {
-  //AboveSkill
-    bool ExprosionPower11;//爆発威力アップ
-    bool ResourceAmount11;//獲得リソースアップ
-    bool ExprosionPower12;
-    bool ExprosionHeightRange11;//「縦」爆発範囲増加
-    bool BombAppearanceRate11;//爆発出現率
-    bool ExprosionWidthRange11;//「横」爆発範囲増加
-    bool ExprosionXRange11;//「×」爆発範囲増加
-    //bool
-    bool ExprosionCrossRange11;//「十字」爆発範囲増加
+    //AboveSkill
+    ExprosionPower11,//爆発威力アップ
+    ResourceAmount11,//獲得リソースアップ
+    ExprosionPower12,
+    ExprosionHeightRange11,//「縦」爆発範囲増加
+    BombAppearanceRate11,//爆発出現率
+    ExprosionWidthRange11,//「横」爆発範囲増加
+    ExprosionXRange11,//「×」爆発範囲増加
+                      //bool
+    ExprosionCrossRange11,//「十字」爆発範囲増加
 
     //UnderSkill
-    bool ExprosionPower21;
-    bool ResourceAmount21;
-    bool ExprosionPowee22;
-    bool ExprosionHeightRange21;
-    bool BombAppearanceRate21;
-    bool ExprosionWidthRange21;
-    bool ExprosionXRange21;
+    ExprosionPower21,
+    ResourceAmount21,
+    ExprosionPowee22,
+    ExprosionHeightRange21,
+    BombAppearanceRate21,
+    ExprosionWidthRange21,
+    ExprosionXRange21,
     //bool
-    bool ExprosionCrossRange21;
+    ExprosionCrossRange21,
 
     //RightSkill
-    bool ExprosionWidthRange31;
-    bool ResourceAmount31;
-    bool ExprosionPower31;
-    bool ExprosionHeightRange31;
-    bool BombAppearanceRate31;
-    bool ExprosionWidthRange32;
-    bool ExprosionXRange31;
-    bool StartBomb31;//初期保有爆弾数
-    bool ExprosionCrossRange31;
+    ExprosionWidthRange31,
+    ResourceAmount31,
+    ExprosionPower31,
+    ExprosionHeightRange31,
+    BombAppearanceRate31,
+    ExprosionWidthRange32,
+    ExprosionXRange31,
+    StartBomb31,//初期保有爆弾数
+    ExprosionCrossRange31,
 
     //LeftSkill
-    bool ExprosionHeightRange41;
-    bool ResourceAmount41;
-    bool ExprosionPower41;
-    bool ExprosionHeightRange42;
-    bool BombAppearanceRate41;
-    bool ExprosionWidthRange42;
-    bool ExprosionXRange41;
-    bool StartBomb41;
-    bool ExprosionCrossRange41;
+    ExprosionHeightRange41,
+    ResourceAmount41,
+    ExprosionPower41,
+    ExprosionHeightRange42,
+    BombAppearanceRate41,
+    ExprosionWidthRange42,
+    ExprosionXRange41,
+    StartBomb41,
+    ExprosionCrossRange41
 }
