@@ -139,15 +139,16 @@ public class BombSet : MonoBehaviour
                     alreadyPlacedBomb.transform.position = clickedObj.transform.position;
                     alreadyPlacedBomb.transform.SetParent(clickedObj.transform);
 
+                    // ★置き直した時もプレイヤー配置フラグを確実に保証
+                    alreadyPlacedBomb.isPlayerPlaced = true;
+
                     Controller controller = UnityEngine.Object.FindFirstObjectByType<Controller>();
                     if (controller != null)
                     {
                         controller.isBombPlacedThisFrame = true;
                     }
 
-                    // スイッチの見た目を更新
                     NotifySwitchUpdate();
-
                     Debug.Log("爆弾を別の場所に置き直しました！");
                     return true;
                 }
@@ -168,6 +169,13 @@ public class BombSet : MonoBehaviour
         GameObject spawnedBomb = Instantiate(itemToPlace, targetBlock.transform.position, Quaternion.identity);
         spawnedBomb.transform.SetParent(targetBlock.transform);
 
+        // ★新設：新しく生成した爆弾に「プレイヤーが置いたよフラグ」を立てる
+        Bomb bombComp = spawnedBomb.GetComponent<Bomb>();
+        if (bombComp != null)
+        {
+            bombComp.isPlayerPlaced = true;
+        }
+
         Controller controller = UnityEngine.Object.FindFirstObjectByType<Controller>();
         if (controller != null)
         {
@@ -184,9 +192,7 @@ public class BombSet : MonoBehaviour
             makeSwitch.BombCount++;
         }
 
-        // スイッチの見た目を更新
         NotifySwitchUpdate();
-
         Debug.Log($"設置完了！起爆ボタンを押すまで置き直しが可能です。");
     }
 
