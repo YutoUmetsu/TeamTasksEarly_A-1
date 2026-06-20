@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class Bomb : MonoBehaviour
 {
@@ -30,16 +31,17 @@ public class Bomb : MonoBehaviour
     [Header("爆風強化が両方（T1・T2）終わっている時のUI画像")]
     [SerializeField] private Sprite upgradedUiSprite;
 
-    // ─── 【新機能：ゲーム画面内の見た目チェンジ用】 ───
     [Header("見た目（画像）が変わる子オブジェクト")]
     [SerializeField] private GameObject spriteChildObject;
 
     [Header("爆風強化が両方終わっている時のゲーム画面用画像")]
     [SerializeField] private Sprite upgradedInGameSprite;
-    // ──────────────────────────────────────────
 
     [Header("爆弾の基礎攻撃力")]
     [SerializeField] private int baseDamage = 1;
+
+    [Header("プレイヤーが設置した爆弾かどうか")]
+    public bool isPlayerPlaced = false;
 
     void Start()
     {
@@ -47,14 +49,19 @@ public class Bomb : MonoBehaviour
         if (extraBlastT1 != null) extraBlastT1.SetActive(false);
         if (extraBlastT2 != null) extraBlastT2.SetActive(false);
 
-        // 【新機能】ゲーム画面内の見た目を強化版に切り替える処理
+        // ゲーム画面内の見た目を強化版に切り替える処理
         TryUpgradeInGameSprite();
     }
 
-    // 新しく追加する関数：条件を満たしていれば配置された爆弾の見た目を変える
+    // MakeSwitch.cs から呼ばれる起爆用の窓口関数
+    public void ExplodeBySwitch()
+    {
+        if (!isPlayerPlaced) return;
+        Explode();
+    }
+
     private void TryUpgradeInGameSprite()
     {
-        // 強化後の画像と、見た目用の子オブジェクトがセットされていないなら何もしない（他の3種はスルーされる）
         if (upgradedInGameSprite == null || spriteChildObject == null) return;
 
         if (BlastAddManager.Instance != null)
@@ -77,7 +84,6 @@ public class Bomb : MonoBehaviour
                     break;
             }
 
-            // 両方解放されていたら、子オブジェクトのSpriteRendererを書き換える！
             if (t1AndT2Unlocked)
             {
                 SpriteRenderer childSpriteRenderer = spriteChildObject.GetComponent<SpriteRenderer>();
@@ -172,8 +178,10 @@ public class Bomb : MonoBehaviour
             controller.TriggerExplosionFall();
         }
 
-        transform.SetParent(null);
-
+        // ─── ★【超重要：処理順の修正】★ ───
+        // 爆風を安全にアクティブ化する前に親を切ると、FallBomb+側が管理クラスに瞬殺され、
+        // 2つ目以降の爆風オブジェクトがこの世から消滅（巻き添え削除）してしまいます。
+        // なので、まずは「すべてアクティブ化」してから独立させます。
         if (explosionAreaGroup != null)
         {
             ExplosionHit[] hitScripts = explosionAreaGroup.GetComponentsInChildren<ExplosionHit>(true);
@@ -182,11 +190,28 @@ public class Bomb : MonoBehaviour
                 hitScript.SetDamage(totalDamage);
             }
 
+            // 先に全方向の爆風オブジェクトのセットを画面に出す
             explosionAreaGroup.SetActive(true);
+
+            // 【画像救出】SetDelete() の巻き添えで非表示になった爆風内の全画像をパッとオンに戻す
+            SpriteRenderer[] childSprites = explosionAreaGroup.GetComponentsInChildren<SpriteRenderer>(true);
+            foreach (SpriteRenderer sr in childSprites)
+            {
+                if (sr.gameObject != this.gameObject)
+                {
+                    sr.enabled = true;
+                }
+            }
+
+            // 爆風が時間経過で消えるためのコルーチンをキック
             StartCoroutine(DisableCollidersDelayed());
         }
 
-        // ─── 【修正：子オブジェクトの画像も一緒に非表示にする】 ───
+        // 基本の爆風セットをすべて出し切った、安全な「ここ」で親子の縁を切る（独立させる）
+        transform.SetParent(null);
+        // ─────────────────────────────────────
+
+        // 自分自身の見た目（画像）を消す
         SpriteRenderer sprite = GetComponent<SpriteRenderer>();
         if (sprite != null) sprite.enabled = false;
 
@@ -195,22 +220,38 @@ public class Bomb : MonoBehaviour
             SpriteRenderer childSprite = spriteChildObject.GetComponent<SpriteRenderer>();
             if (childSprite != null) childSprite.enabled = false;
         }
-        // ────────────────────────────────────────────────────────
 
         Destroy(gameObject, destroyDelay);
     }
 
     private System.Collections.IEnumerator DisableCollidersDelayed()
     {
-        yield return new WaitForFixedUpdate();
+        float elapsed = 0f;
 
+        // 爆風が出ている時間（destroyDelay秒）が経過するまで、毎フレーム画像を維持し続ける
+        while (elapsed < destroyDelay)
+        {
+            if (explosionAreaGroup != null)
+            {
+                // 他のスクリプト（FallObjectなど）による非表示化を毎フレーム上書きして拒否する
+                SpriteRenderer[] childSprites = explosionAreaGroup.GetComponentsInChildren<SpriteRenderer>(true);
+                foreach (SpriteRenderer sr in childSprites)
+                {
+                    if (sr.gameObject != this.gameObject)
+                    {
+                        sr.enabled = true;
+                    }
+                }
+            }
+
+            elapsed += Time.deltaTime;
+            yield return null; // 1フレーム待つ
+        }
+
+        // 時間が来たら、爆風オブジェクト自体を完全に非アクティブにして消し去る
         if (explosionAreaGroup != null)
         {
-            Collider2D[] explosionColliders = explosionAreaGroup.GetComponentsInChildren<Collider2D>();
-            foreach (Collider2D col in explosionColliders)
-            {
-                if (col != null) col.enabled = false;
-            }
+            explosionAreaGroup.SetActive(false);
         }
     }
 }
