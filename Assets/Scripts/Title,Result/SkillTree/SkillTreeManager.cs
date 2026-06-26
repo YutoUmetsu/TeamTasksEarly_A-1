@@ -14,7 +14,7 @@ public class SkillTreeManager : MonoBehaviour
         }
     }
 
-    public int CostPoint = 0;
+    public int CostPoint = CoinManager.Instance.TotalCoins;
     public Button PrestigeButton;
     public Skilltree CenterSkill;
     public TMP_Text pointsText;
@@ -184,6 +184,7 @@ public class SkillTreeManager : MonoBehaviour
     }
     public void UpdatePointText()//UI更新専用の関数
     {
+        CostPoint = CoinManager.Instance.TotalCoins;
         pointsText.text = "ポイント:" + CostPoint;
     }
 }
