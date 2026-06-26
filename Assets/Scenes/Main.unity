@@ -1534,6 +1534,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 3468364833027856995, guid: dbaf3b5e54a75ed48924439df5043e96, type: 3}
     - target: {fileID: 8983576289099948456, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
+      propertyPath: baseBoardSize
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983576289099948456, guid: 3840a5c0218c3724cb2244b065871b33, type: 3}
       propertyPath: bomdSpawnParcent
       value: 15
       objectReference: {fileID: 0}

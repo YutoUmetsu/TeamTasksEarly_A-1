@@ -122,6 +122,8 @@ public class Skilltree : MonoBehaviour
         UnlokkedSkill = true;
         AvailobleSkill = false;
 
+        manager.ApplySkill(this.skillType);
+
         GetSkillCount();
 
         foreach (var next in NextSkill)

@@ -151,7 +151,7 @@ public class Bomb : MonoBehaviour
             {
                 case BombType.Vertical:
                     t1 = BlastAddManager.Instance.bombVarticle.hasBlastT1;
-                    t2 = BlastAddManager.Instance.bombVarticle.hasBlastT2; // 修正箇所（タイポ除去）
+                    t2 = BlastAddManager.Instance.bombVarticle.hasBlastT2;
                     break;
                 case BombType.Horizon:
                     t1 = BlastAddManager.Instance.bombHorizon.hasBlastT1;
@@ -231,9 +231,21 @@ public class Bomb : MonoBehaviour
         SpriteRenderer[] childSprites = explosionAreaGroup.GetComponentsInChildren<SpriteRenderer>(true);
 
         List<SpriteRenderer> blastSprites = new List<SpriteRenderer>();
+
+        // 爆弾本体側のSpriteRendererを確実に特定してループの対象から弾く
+        SpriteRenderer ownSpriteRenderer = GetComponent<SpriteRenderer>();
+
         foreach (SpriteRenderer sr in childSprites)
         {
-            if (sr.gameObject != this.gameObject) blastSprites.Add(sr);
+            if (sr == null) continue;
+
+            // 爆弾本体のオブジェクト、または本体のSpriteRendererなら絶対に除外
+            if (sr.gameObject == this.gameObject || sr == ownSpriteRenderer)
+            {
+                continue;
+            }
+
+            blastSprites.Add(sr);
         }
 
         if (blastSprites.Count == 0) yield break;

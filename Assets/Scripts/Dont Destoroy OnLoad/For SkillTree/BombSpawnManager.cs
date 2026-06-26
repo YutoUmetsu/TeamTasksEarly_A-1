@@ -28,4 +28,10 @@ public class BombSpawnManager : MonoBehaviour
         bonusBombPercent += amount;
         Debug.Log($"爆弾のドロップ確率ボーナスが +{amount}% されました！ 現在のボーナス: {bonusBombPercent}%");
     }
+    // ─── 追加：プレステージ用のリセット処理 ───
+    public void ResetSkillData()
+    {
+        bonusBombPercent = 0f;
+        Debug.Log("BombSpawnManager: ドロップ確率ボーナスをリセットしました。");
+    }
 }

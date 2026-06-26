@@ -356,6 +356,9 @@ GameObject:
   - component: {fileID: 158145664}
   - component: {fileID: 158145663}
   - component: {fileID: 158145666}
+  - component: {fileID: 158145667}
+  - component: {fileID: 158145669}
+  - component: {fileID: 158145668}
   m_Layer: 0
   m_Name: SkillTreeEfeectiveManager
   m_TagString: Untagged
@@ -417,6 +420,56 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BombSpawnManager
   bonusBombPercent: 0
+--- !u!114 &158145667
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 158145662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24c5c1d636e28de41a59741d9be368b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BlastAddManager
+  bombVarticle:
+    hasBlastT1: 0
+    hasBlastT2: 0
+  bombHorizon:
+    hasBlastT1: 0
+    hasBlastT2: 0
+  bombCrossT:
+    hasBlastT1: 0
+    hasBlastT2: 0
+  bombCrossX:
+    hasBlastT1: 0
+    hasBlastT2: 0
+--- !u!114 &158145668
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 158145662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23b52e69ea5b57348bc8522c3aaa16b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CoinBonusManager
+  bonusCoinAmount: 0
+--- !u!114 &158145669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 158145662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b393eef219740bf4b989c020bdd8bba8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BoardSizeManager
+  bonusBoardSize: 0
 --- !u!1 &188710551
 GameObject:
   m_ObjectHideFlags: 0

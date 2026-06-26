@@ -314,7 +314,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DestructibleBlock
   coinRewardAmount: 9
-  coinVisualPrefab: {fileID: 1901812807532613576, guid: dd9c209d17a46a54e8fed828034054f6, type: 3}
+  coinVisualPrefab: {fileID: 3075023401187976702, guid: 6deb466c594846d4cbb1cc55ace92dfe, type: 3}
+  coinVisualPrefab5x: {fileID: 1901812807532613576, guid: dd9c209d17a46a54e8fed828034054f6, type: 3}
   upwardForce: 5
   sideForce: 2
 --- !u!1001 &103396469074597524
