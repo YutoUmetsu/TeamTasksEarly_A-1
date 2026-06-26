@@ -24,9 +24,16 @@ public class CoinManager : MonoBehaviour
     public void AddCoin(int amount)
     {
         TotalCoins += amount;
-        AddCoins += amount;
+
+        // 増えたときだけ AddCoins に加算する
+        if (amount > 0)
+        {
+            AddCoins += amount;
+        }
+
         Debug.Log($"現在の総量: {TotalCoins}枚");
     }
+
 
     /// <summary>
     /// 指定された枚数のコインを消費する。足りていれば減らしてtrue、足りなければfalseを返す。

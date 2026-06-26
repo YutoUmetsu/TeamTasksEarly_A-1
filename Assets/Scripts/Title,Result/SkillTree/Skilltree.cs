@@ -116,7 +116,8 @@ public class Skilltree : MonoBehaviour
         }
 
         // ‚±‚±‚©‚çæ“¾ˆ—
-        manager.CostPoint -= cost;
+        CoinManager.Instance.AddCoin(-cost);
+        manager.UpdatePointText();
 
         UnlokkedSkill = true;
         AvailobleSkill = false;
