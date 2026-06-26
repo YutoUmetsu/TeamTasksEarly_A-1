@@ -1,37 +1,55 @@
 using UnityEngine;
+using System.Collections;
+
+[RequireComponent(typeof(SpriteRenderer))]
 
 public class BlinkStars : MonoBehaviour
 {
-    [SerializeField] float blinkInterval = 0.5f; // 点滅間隔
-    [SerializeField] float rotateAngle = 15f;    // 1回ごとの回転角度
+    private float fadeTime = 1.0f;   // フェード時間
+    private float minAlpha = 0.2f;   // 一番薄い透明度
+    private float maxAlpha = 1.0f;   // 一番濃い透明度
 
-    SpriteRenderer sr;
-
-    bool visible = true;
-    float timer = 0f;
+    private SpriteRenderer spriteRenderer;
 
     void Start()
     {
-        sr = GetComponent<SpriteRenderer>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        StartCoroutine(Blink());
     }
 
-    void Update()
+    IEnumerator Blink()
     {
-        timer += Time.deltaTime;
-
-        if (timer >= blinkInterval)
+        while (true)
         {
-            timer = 0f;
+            // 薄くなる
+            yield return Fade(maxAlpha, minAlpha);
 
-            // 表示・非表示切り替え
-            visible = !visible;
+            // 左右反転
+            spriteRenderer.flipX = !spriteRenderer.flipX;
 
-            Color color = sr.color;
-            color.a = visible ? 1f : 0f;
-            sr.color = color;
-
-            // 点滅のたびに回転
-            transform.Rotate(0f, 0f, rotateAngle);
+            // 濃くなる
+            yield return Fade(minAlpha, maxAlpha);
         }
+    }
+
+    IEnumerator Fade(float start, float end)
+    {
+        float time = 0;
+
+        while (time < fadeTime)
+        {
+            time += Time.deltaTime;
+            float alpha = Mathf.Lerp(start, end, time / fadeTime);
+
+            Color color = spriteRenderer.color;
+            color.a = alpha;
+            spriteRenderer.color = color;
+
+            yield return null;
+        }
+
+        Color c = spriteRenderer.color;
+        c.a = end;
+        spriteRenderer.color = c;
     }
 }
