@@ -5,6 +5,15 @@ using UnityEngine.UI;
 
 public class SkillTreeManager : MonoBehaviour
 {
+    void Awake()
+    {
+        if (!PlayerPrefs.HasKey("GameStarted"))
+        {
+            PlayerPrefs.DeleteAll();
+            PlayerPrefs.SetInt("GameStarted", 1);
+        }
+    }
+
     public int CostPoint = 0;
     public Button PrestigeButton;
     public Skilltree CenterSkill;
@@ -66,6 +75,45 @@ public class SkillTreeManager : MonoBehaviour
         return true;
     }
 
+    
+
+    public void SaveData()//スキルツリー全体を保存
+    {
+        foreach (var skill in AllSkills)
+        {
+            skill.SaveSkill();
+        }
+
+        PlayerPrefs.SetInt("CostPoint", CostPoint);
+
+        PlayerPrefs.Save();
+    }
+
+    public void LoadData()//スキルツリー全体を読み込み
+    {
+        foreach (var skill in AllSkills)
+        {
+            skill.LoadSkill();
+            skill.AvailobleSkill = false;
+        }
+        foreach (var skill in AllSkills)
+        {
+            if (skill.UnlokkedSkill)
+            {
+                foreach (var next in skill.NextSkill)
+                {
+                    next.AvailobleSkill = true;
+                }
+            }
+        }
+        if (!CenterSkill.UnlokkedSkill)
+        {
+            CenterSkill.AvailobleSkill = true;
+        }
+        CenterSkill.AvailobleSkill = !CenterSkill.UnlokkedSkill;
+        CostPoint = PlayerPrefs.GetInt("CostPoint", 0);
+    }
+
 
     //リセット処理
     public void Prestige()
@@ -80,8 +128,15 @@ public class SkillTreeManager : MonoBehaviour
         CenterSkill.AvailobleSkill = true;
 
         Debug.Log("スキルツリーをリセット");
+
+        LoadData();
+
+        CenterSkill.AvailobleSkill = !CenterSkill.UnlokkedSkill;
+
+        UpdatePointText();
     }
 
+   
     void Start()
     {
         Debug.Log(CenterSkill);
@@ -98,8 +153,15 @@ public class SkillTreeManager : MonoBehaviour
             return;
         }
 
-        CenterSkill.AvailobleSkill = true;
+        LoadData();
+
+        if (!CenterSkill.UnlokkedSkill)
+        {
+            CenterSkill.AvailobleSkill = true;
+        }
+
         UpdatePointText();
+
     }
 
     void Update()
@@ -115,7 +177,11 @@ public class SkillTreeManager : MonoBehaviour
             PrestigeButton.interactable = false;
         }
     }
-
+    void OnApplicationQuit()
+    {
+        PlayerPrefs.DeleteAll();
+        PlayerPrefs.Save();
+    }
     public void UpdatePointText()//UI更新専用の関数
     {
         pointsText.text = "ポイント:" + CostPoint;

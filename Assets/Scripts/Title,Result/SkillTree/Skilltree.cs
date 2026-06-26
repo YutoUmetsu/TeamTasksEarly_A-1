@@ -42,6 +42,7 @@ public class Skilltree : MonoBehaviour
 
     public void UnlockSkilltree(SkillTreeManager manager)
     {
+        
         /* if (CoinManager.Instance.TrySpendCoins(Cost)) {
              switch (skillType)
              {
@@ -91,50 +92,46 @@ public class Skilltree : MonoBehaviour
              }*/
 
         Debug.Log("UnlockSkilltree開始");
-
+        // 取得済みなら何もしない
         if (UnlokkedSkill)
         {
             Debug.Log("既に取得済み");
             return;
         }
 
+        // 取得不可なら何もしない
         if (!AvailobleSkill)
         {
             Debug.Log("取得不可");
             return;
         }
 
-        if (manager.CostPoint < SkillCountCalculation())
+        int cost = SkillCountCalculation();
+
+        // ポイント不足なら何もしない
+        if (manager.CostPoint < cost)
         {
             Debug.Log("ポイント不足");
             return;
         }
 
-        Debug.Log("取得成功");
-        Debug.Log(SkillCount);
-
-        if (UnlokkedSkill) return; //すでに取得済み
-
-        if (!AvailobleSkill) return;  //取得不可
-
-       // if(manager.CostPoint < Cost) return; //ポイント不足
-
-        manager.CostPoint -= SkillCountCalculation(); //ポイント消費
+        // ここから取得処理
+        manager.CostPoint -= cost;
 
         UnlokkedSkill = true;
         AvailobleSkill = false;
 
-        //次のスキル開放
-        foreach(var next in NextSkill)
+        GetSkillCount();
+
+        foreach (var next in NextSkill)
         {
             next.AvailobleSkill = true;
         }
 
-
-        manager.UpdatePointText(); //UI更新
+        manager.UpdatePointText();
+        manager.SaveData();
 
         Debug.Log(SkillName + " を取得");
-
 
     }
 
@@ -154,6 +151,16 @@ public class Skilltree : MonoBehaviour
         }
 
         lastClickTime = Time.time;
+    }
+
+    public void SaveSkill()//セーブ
+    {
+        PlayerPrefs.SetInt(SkillName, UnlokkedSkill ? 1 : 0);
+    }
+
+    public void LoadSkill()//ロード
+    {
+        UnlokkedSkill = PlayerPrefs.GetInt(SkillName, 0) == 1;
     }
 
     public void GetSkillCount()
