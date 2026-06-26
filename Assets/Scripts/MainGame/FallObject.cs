@@ -19,6 +19,23 @@ public class FallObject : MonoBehaviour
     [SerializeField] private int maxHp = 1; // インスペクターでブロックごとに耐久値を変えられます
     private int currentHp;
 
+    //ひび割れの出力用
+    [SerializeField] GameObject Damage1;//ヒビの画像
+    [SerializeField] GameObject Damage2;
+    [SerializeField] GameObject Damage3;
+    [SerializeField] int damage1st;
+    [SerializeField] int damage2nd;
+    [SerializeField] int damage3rd;
+
+    private void Start()
+    {
+        if (Damage1 == null || Damage2 == null || Damage3 == null)
+            return;
+        Damage1.SetActive(false);           
+        Damage2.SetActive(false);        
+        Damage3.SetActive(false);
+    }
+
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -125,5 +142,53 @@ public class FallObject : MonoBehaviour
 
             SetDelete();
         }
+    }
+    //private void FixedUpdate()
+    //{
+    //    if (Damage1 == null || Damage2 == null || Damage3 == null)
+    //        return;
+
+    //    if (currentHp <= damage1st && currentHp > damage2nd)
+    //    {
+    //        Damage1.SetActive(true);
+    //    }
+    //    else if (currentHp <= damage2nd && currentHp > damage3rd)
+    //    {
+    //        Damage1.SetActive(false);
+    //        Damage2.SetActive(true);
+    //    }
+    //    else if (currentHp <= damage3rd && currentHp > 0)
+    //    {
+    //        Damage2.SetActive(false);
+    //        Damage3.SetActive(true);
+    //    }
+    //    else
+    //    {
+    //        Damage1.SetActive(false);
+    //        Damage2.SetActive(false);
+    //        Damage3.SetActive(false);
+    //    }
+    //}
+
+    public void UpdateSprite()
+    {
+        if (Damage1 == null || Damage2 == null || Damage3 == null)
+            return;
+
+        if (currentHp <= damage1st && currentHp > damage2nd)
+        {
+            Damage1.SetActive(true);
+        }
+        else if (currentHp <= damage2nd && currentHp > damage3rd)
+        {
+            Damage1.SetActive(false);
+            Damage2.SetActive(true);
+        }
+        else if (currentHp <= damage3rd && currentHp > 0)
+        {
+            Damage2.SetActive(false);
+            Damage3.SetActive(true);
+        }
+ 
     }
 }

@@ -44,6 +44,7 @@ public class ExplosionHit : MonoBehaviour
                     if (fallObj.isFall) continue;
 
                     fallObj.TakeDamage(currentExplosionDamage);
+                    fallObj.UpdateSprite();
                     Debug.Log($"爆風ヒット: {hitObjectName} に {currentExplosionDamage} ダメージを与えました。");
                 }
                 else
