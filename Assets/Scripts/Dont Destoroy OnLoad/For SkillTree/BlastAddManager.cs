@@ -32,4 +32,13 @@ public class BlastAddManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+    // ─── 追加：プレステージ用のリセット処理 ───
+    public void ResetSkillData()
+    {
+        bombVarticle = new BombBlastData();
+        bombHorizon = new BombBlastData();
+        bombCrossT = new BombBlastData();
+        bombCrossX = new BombBlastData();
+        Debug.Log("BlastAddManager: スキル解放状況をリセットしました。");
+    }
 }

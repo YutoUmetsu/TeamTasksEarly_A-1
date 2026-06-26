@@ -28,4 +28,10 @@ public class BombInventoryManager : MonoBehaviour
         bonusMaxBombs += amount;
         Debug.Log($"爆弾の設置上限ボーナスが +{amount} されました！ 現在のボーナス: {bonusMaxBombs}");
     }
+    // ─── 追加：プレステージ用のリセット処理 ───
+    public void ResetSkillData()
+    {
+        bonusMaxBombs = 0;
+        Debug.Log("BombInventoryManager: 設置上限ボーナスをリセットしました。");
+    }
 }

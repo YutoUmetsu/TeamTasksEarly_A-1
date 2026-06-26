@@ -26,4 +26,10 @@ public class BombPowerManager : MonoBehaviour
         bonusDamage += amount;
         Debug.Log($"爆弾の威力ボーナスが +{amount} されました！ 現在のボーナス: {bonusDamage}");
     }
+    // ─── 追加：プレステージ用のリセット処理 ───
+    public void ResetSkillData()
+    {
+        bonusDamage = 0;
+        Debug.Log("BombPowerManager: 威力ボーナスをリセットしました。");
+    }
 }

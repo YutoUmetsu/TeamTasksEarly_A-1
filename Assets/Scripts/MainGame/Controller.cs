@@ -5,7 +5,9 @@ using UnityEngine.InputSystem;
 public class Controller : MonoBehaviour
 {
     [SerializeField] GameObject fallPrefab;
-    [SerializeField] int boardSize;
+
+    [SerializeField] int baseBoardSize; // インスペクターでの基本サイズ（例: 5）
+    int currentBoardSize; // スキル分を足した実際のサイズ
     Vector2 startPos;
     FallObject[,] fallObjects;
     [SerializeField] float fallTime;
@@ -13,7 +15,7 @@ public class Controller : MonoBehaviour
 
     [Header("爆弾補充の設定")]
     [SerializeField] System.Collections.Generic.List<GameObject> bombPrefabs;
-    [SerializeField] float bomdSpawnParcent = 15f; // 基本の確率（15～35%）
+    [SerializeField] float bomdSpawnParcent = 15f;
 
     [Header("確率で降ってくる新しいブロックの設定")]
     [SerializeField] System.Collections.Generic.List<GameObject> rareBlockPrefabs;
@@ -36,16 +38,21 @@ public class Controller : MonoBehaviour
     [System.NonSerialized] public bool isBombPlacedThisFrame = false;
     private BombSet bombSet;
 
-    // ─── ★【追加：盤面の処理が完全に静止したかを外部に伝えるフラグ】★ ───
     [System.NonSerialized] public bool isBoardSettledThisFrame = false;
 
-    // コインのカウント用変数
     private int activeCoinCount = 0;
 
     void Start()
     {
         startPos = transform.position;
         bombSet = UnityEngine.Object.FindFirstObjectByType<BombSet>();
+
+        // ─── ★【追加：スキルツリーのボーナスを基本サイズに加算】───
+        currentBoardSize = baseBoardSize;
+        if (BoardSizeManager.Instance != null)
+        {
+            currentBoardSize += BoardSizeManager.Instance.bonusBoardSize;
+        }
 
         GenerateBoard();
         ControllerUpdate = new Action[(int)GameState.Max];
@@ -55,15 +62,16 @@ public class Controller : MonoBehaviour
         ControllerUpdate[(int)GameState.Fall] += FallUpdate;
         OnExit[(int)GameState.Fall] += Delete;
         objHalfWidth = fallPrefab.transform.localScale.x / 2;
-        float pos = boardSize / 2f - objHalfWidth;
+        float pos = currentBoardSize / 2f - objHalfWidth;
     }
 
     void GenerateBoard()
     {
-        fallObjects = new FallObject[boardSize, boardSize];
-        for (int x = 0; x < boardSize; x++)
+        // currentBoardSize を使って配列を確保
+        fallObjects = new FallObject[currentBoardSize, currentBoardSize];
+        for (int x = 0; x < currentBoardSize; x++)
         {
-            for (int y = 0; y < boardSize; y++)
+            for (int y = 0; y < currentBoardSize; y++)
             {
                 Vector2 spawnPos = startPos + new Vector2(x, y);
 
@@ -121,7 +129,6 @@ public class Controller : MonoBehaviour
             delay = activeBomb.destroyDelay;
         }
 
-        // 爆風の演出時間をしっかり待機
         yield return new WaitForSeconds(delay);
 
         if (nowState == GameState.Select)
@@ -138,11 +145,11 @@ public class Controller : MonoBehaviour
             finalSpawnPercent += BombSpawnManager.Instance.bonusBombPercent;
         }
 
-        for (int x = 0; x < boardSize; x++)
+        for (int x = 0; x < currentBoardSize; x++)
         {
             int emptyCount = 0;
 
-            for (int y = 0; y < boardSize; y++)
+            for (int y = 0; y < currentBoardSize; y++)
             {
                 if (fallObjects[x, y] == null)
                 {
@@ -175,7 +182,7 @@ public class Controller : MonoBehaviour
 
                 for (int i = 0; i < emptyCount; i++)
                 {
-                    int spawnYIndex = boardSize + i;
+                    int spawnYIndex = currentBoardSize + i;
                     Vector2 spawnPos = startPos + new Vector2(x, spawnYIndex);
 
                     GameObject prefabToSpawn = fallPrefab;
@@ -199,7 +206,7 @@ public class Controller : MonoBehaviour
                     GameObject newBlock = Instantiate(prefabToSpawn, spawnPos, Quaternion.identity);
                     FallObject fallObj = newBlock.GetComponent<FallObject>();
 
-                    int targetGridY = boardSize - emptyCount + i;
+                    int targetGridY = currentBoardSize - emptyCount + i;
                     Vector2 targetWorldY = startPos + new Vector2(x, targetGridY);
 
                     fallObj.StartUpFallObject(BlockState.Normal, spawnYIndex);
@@ -207,7 +214,7 @@ public class Controller : MonoBehaviour
 
                     if (bombSet != null) bombSet.RegisterTarget(newBlock);
 
-                    while (arrayYPointer < boardSize)
+                    while (arrayYPointer < currentBoardSize)
                     {
                         if (fallObjects[x, arrayYPointer] == null ||
                             fallObjects[x, arrayYPointer].state == BlockState.Delete ||
@@ -235,9 +242,9 @@ public class Controller : MonoBehaviour
 
         bool anyBlockMoving = false;
 
-        for (int x = 0; x < boardSize; x++)
+        for (int x = 0; x < currentBoardSize; x++)
         {
-            for (int y = 0; y < boardSize; y++)
+            for (int y = 0; y < currentBoardSize; y++)
             {
                 if (fallObjects[x, y] == null) continue;
                 if (fallObjects[x, y].state == BlockState.Delete || fallObjects[x, y].state == BlockState.Empty) continue;
@@ -263,9 +270,9 @@ public class Controller : MonoBehaviour
 
     void Delete()
     {
-        for (int x = 0; x < boardSize; x++)
+        for (int x = 0; x < currentBoardSize; x++)
         {
-            for (int y = 0; y < boardSize; y++)
+            for (int y = 0; y < currentBoardSize; y++)
             {
                 if (fallObjects[x, y] == null) continue;
 
@@ -278,17 +285,17 @@ public class Controller : MonoBehaviour
             }
         }
 
-        FallObject[,] nextGrid = new FallObject[boardSize, boardSize];
+        FallObject[,] nextGrid = new FallObject[currentBoardSize, currentBoardSize];
 
-        for (int x = 0; x < boardSize; x++)
+        for (int x = 0; x < currentBoardSize; x++)
         {
-            for (int y = 0; y < boardSize; y++)
+            for (int y = 0; y < currentBoardSize; y++)
             {
                 if (fallObjects[x, y] == null) continue;
 
                 int trueY = fallObjects[x, y].PosY();
 
-                if (trueY >= 0 && trueY < boardSize)
+                if (trueY >= 0 && trueY < currentBoardSize)
                 {
                     nextGrid[x, trueY] = fallObjects[x, y];
                 }
@@ -298,10 +305,10 @@ public class Controller : MonoBehaviour
         fallObjects = nextGrid;
         nowState = GameState.Select;
 
-        // ─── ★【追加：爆発・落下・補充の全処理が今この瞬間に完全に終了！】★ ───
         isBoardSettledThisFrame = true;
     }
 
+    // ─── ★【5枚コイン対応 ＆ コインボーナススキル連動版】★ ───
     public void SpawnCoinImmediate(FallObject targetObj)
     {
         if (targetObj == null) return;
@@ -309,34 +316,72 @@ public class Controller : MonoBehaviour
         DestructibleBlock db = targetObj.GetComponent<DestructibleBlock>();
         if (db != null)
         {
-            if (CoinManager.Instance != null)
+            // ベースの枚数を取得
+            int totalAmount = db.coinRewardAmount;
+
+            // ★スキルによる追加コインボーナスを加算
+            if (CoinBonusManager.Instance != null)
             {
-                CoinManager.Instance.AddCoin(db.coinRewardAmount);
+                totalAmount += CoinBonusManager.Instance.bonusCoinAmount;
             }
 
-            if (db.coinVisualPrefab != null)
+            // CoinManager（データ側）に最終獲得枚数を一気に加算
+            if (CoinManager.Instance != null)
             {
-                GameObject spawnedCoin = Instantiate(db.coinVisualPrefab, db.transform.position, Quaternion.identity);
+                CoinManager.Instance.AddCoin(totalAmount);
+            }
 
-                CoinDestroyNotifier notifier = spawnedCoin.AddComponent<CoinDestroyNotifier>();
-                notifier.Setup(this);
+            int count5x = 0;
+            int count1x = 0;
 
-                activeCoinCount++;
+            // 5枚コインのプレハブが設定されている場合のみ割り算
+            if (db.coinVisualPrefab5x != null)
+            {
+                count5x = totalAmount / 5;
+                count1x = totalAmount % 5;
+            }
+            else
+            {
+                count1x = totalAmount;
+            }
 
-                Rigidbody2D coinRb = spawnedCoin.GetComponent<Rigidbody2D>();
-                if (coinRb != null)
+            // 5枚コイン生成
+            for (int i = 0; i < count5x; i++)
+            {
+                CreateCoinObject(db.coinVisualPrefab5x, db);
+            }
+
+            // 1枚コイン生成
+            for (int i = 0; i < count1x; i++)
+            {
+                if (db.coinVisualPrefab != null)
                 {
-                    float randomX = UnityEngine.Random.Range(-db.sideForce, db.sideForce);
-                    Vector2 launchVelocity = new Vector2(randomX, db.upwardForce);
-                    coinRb.linearVelocity = launchVelocity;
+                    CreateCoinObject(db.coinVisualPrefab, db);
                 }
             }
         }
     }
 
-    public void DecrementCoinCount()
+    private void CreateCoinObject(GameObject prefab, DestructibleBlock db)
     {
-        activeCoinCount--;
+        if (prefab == null) return;
+
+        GameObject spawnedCoin = Instantiate(prefab, db.transform.position, Quaternion.identity);
+
+        CoinDestroyNotifier notifier = spawnedCoin.AddComponent<CoinDestroyNotifier>();
+        notifier.Setup(this);
+
+        activeCoinCount++;
+
+        Rigidbody2D coinRb = spawnedCoin.GetComponent<Rigidbody2D>();
+        if (coinRb != null)
+        {
+            float randomX = UnityEngine.Random.Range(-db.sideForce, db.sideForce);
+            float randomY = db.upwardForce * UnityEngine.Random.Range(0.8f, 1.2f);
+
+            Vector2 launchVelocity = new Vector2(randomX, randomY);
+            coinRb.linearVelocity = launchVelocity;
+        }
     }
 
     private GameObject GetRandomBlockWithWeight(System.Collections.Generic.List<GameObject> blockList)
@@ -363,5 +408,10 @@ public class Controller : MonoBehaviour
         }
 
         return fallPrefab;
+    }
+    // コインが消えた時にカウントを減らす関数
+    public void DecrementCoinCount()
+    {
+        activeCoinCount--;
     }
 }
