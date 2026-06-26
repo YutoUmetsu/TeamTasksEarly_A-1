@@ -6,6 +6,7 @@ public class CoinManager : MonoBehaviour
 
     // ƒRƒCƒ“‚Ì‘—Ê‚Ì‚İ‚ğŠÇ—
     public int TotalCoins { get; private set; } = 0;
+    public int AddCoins { get; set; } = 0;
 
     void Awake()
     {
@@ -23,6 +24,7 @@ public class CoinManager : MonoBehaviour
     public void AddCoin(int amount)
     {
         TotalCoins += amount;
+        AddCoins += amount;
         Debug.Log($"Œ»İ‚Ì‘—Ê: {TotalCoins}–‡");
     }
 
