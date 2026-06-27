@@ -36,8 +36,14 @@ public class Bomb : MonoBehaviour
     [Header("通常時のUIストック画像")]
     public Sprite uiSprite;
 
+    [Header("待機中（2個目以降）のUIストック画像")]
+    public Sprite waitingUiSprite;
+
     [Header("爆風強化が両方（T1・T2）終わっている時のUI画像")]
     [SerializeField] private Sprite upgradedUiSprite;
+
+    [Header("爆風強化完了＆待機中のUIストック画像")]
+    [SerializeField] private Sprite upgradedWaitingUiSprite;
 
     [Header("見た目（画像）が変わる子オブジェクト")]
     [SerializeField] private GameObject spriteChildObject;
@@ -131,6 +137,43 @@ public class Bomb : MonoBehaviour
         }
 
         return uiSprite;
+    }
+
+    // ★現在のアップグレード状況に応じた「待機中画像」を返す関数
+    public Sprite GetCurrentWaitingUiSprite()
+    {
+        if (BlastAddManager.Instance != null && upgradedWaitingUiSprite != null)
+        {
+            bool t1AndT2Unlocked = false;
+
+            switch (bombType)
+            {
+                case BombType.Vertical:
+                    t1AndT2Unlocked = BlastAddManager.Instance.bombVarticle.hasBlastT1 && BlastAddManager.Instance.bombVarticle.hasBlastT2;
+                    break;
+                case BombType.Horizon:
+                    t1AndT2Unlocked = BlastAddManager.Instance.bombHorizon.hasBlastT1 && BlastAddManager.Instance.bombHorizon.hasBlastT2;
+                    break;
+                case BombType.CrossT:
+                    t1AndT2Unlocked = BlastAddManager.Instance.bombCrossT.hasBlastT1 && BlastAddManager.Instance.bombCrossT.hasBlastT2;
+                    break;
+                case BombType.CrossX:
+                    t1AndT2Unlocked = BlastAddManager.Instance.bombCrossX.hasBlastT1 && BlastAddManager.Instance.bombCrossX.hasBlastT2;
+                    break;
+            }
+
+            if (t1AndT2Unlocked)
+            {
+                return upgradedWaitingUiSprite;
+            }
+        }
+
+        if (waitingUiSprite != null)
+        {
+            return waitingUiSprite;
+        }
+
+        return GetCurrentUiSprite();
     }
 
     public void Explode()
@@ -229,22 +272,16 @@ public class Bomb : MonoBehaviour
         if (explosionAreaGroup == null) yield break;
 
         SpriteRenderer[] childSprites = explosionAreaGroup.GetComponentsInChildren<SpriteRenderer>(true);
-
         List<SpriteRenderer> blastSprites = new List<SpriteRenderer>();
-
-        // 爆弾本体側のSpriteRendererを確実に特定してループの対象から弾く
         SpriteRenderer ownSpriteRenderer = GetComponent<SpriteRenderer>();
 
         foreach (SpriteRenderer sr in childSprites)
         {
             if (sr == null) continue;
-
-            // 爆弾本体のオブジェクト、または本体のSpriteRendererなら絶対に除外
             if (sr.gameObject == this.gameObject || sr == ownSpriteRenderer)
             {
                 continue;
             }
-
             blastSprites.Add(sr);
         }
 
@@ -256,7 +293,6 @@ public class Bomb : MonoBehaviour
         {
             elapsed += Time.deltaTime;
             float normalizedTime = Mathf.Clamp01(elapsed / destroyDelay);
-
             float targetAlpha = 1f;
 
             if (normalizedTime < fadeInRatio && fadeInRatio > 0)
@@ -274,9 +310,7 @@ public class Bomb : MonoBehaviour
             foreach (SpriteRenderer sr in blastSprites)
             {
                 if (sr == null) continue;
-
                 sr.enabled = true;
-
                 Color c = sr.color;
                 c.a = targetAlpha;
                 sr.color = c;
