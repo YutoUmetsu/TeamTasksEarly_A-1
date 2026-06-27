@@ -2,16 +2,17 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-// Unityのドラッグ機能（EventSystems）をフル活用する呪文
 public class BombUIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     private CanvasGroup canvasGroup;
     private Vector3 originalPosition;
     private Transform originalParent;
+    private int originalIndex;
     private BombSet bombSet;
     private bool isFirstIcon = false;
 
-    // 一番上のアイコンだけドラッグできるようにBombSetから初期化してもらう関数
+    public bool IsCurrentlyDragging { get; private set; } = false;
+
     public void Setup(BombSet set, bool canDrag)
     {
         bombSet = set;
@@ -20,57 +21,69 @@ public class BombUIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler,
         canvasGroup = GetComponent<CanvasGroup>();
         if (canvasGroup == null) canvasGroup = gameObject.AddComponent<CanvasGroup>();
 
-        // 一番上じゃないアイコンは半透明にして、掴めないようにレイキャストを無視させる
         if (!isFirstIcon)
         {
             canvasGroup.alpha = 0.6f;
             canvasGroup.blocksRaycasts = false;
         }
+        else
+        {
+            canvasGroup.alpha = 1.0f;
+            canvasGroup.blocksRaycasts = true;
+        }
     }
 
-    // ドラッグを開始した瞬間
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (!isFirstIcon || bombSet == null || bombSet.IsPlacementLocked()) return;
 
+        IsCurrentlyDragging = true;
+        bombSet.CurrentlyDraggingHandler = this; // ★修正点：BombSetに「私が今ドラッグ中だよ」と直接教える
+
         originalPosition = transform.position;
         originalParent = transform.parent;
+        originalIndex = transform.GetSiblingIndex();
 
-        // ドラッグ中のアイコンが他のUIの背後に隠れないように、一時的にルート（最前面）に出す
         transform.SetParent(originalParent.root);
-
-        // ドラッグ中のマウスの真下にある「ゲーム画面（ブロック）」を検知できるように、UIの当たり判定を一時OFFにする
         canvasGroup.blocksRaycasts = false;
+
+        // ★追加：ドラッグ開始直後に周りのUI（待機画像など）を即座に正しく整列させる
+        bombSet.RefreshStockUI();
     }
 
-    // ドラッグ（マウス移動）中
     public void OnDrag(PointerEventData eventData)
     {
         if (!isFirstIcon || bombSet == null || bombSet.IsPlacementLocked()) return;
 
-        // マウスの位置にUIアイコンをぴったり追従させる
         transform.position = eventData.position;
     }
 
-    // マウスを離した（ドロップした）瞬間
     public void OnEndDrag(PointerEventData eventData)
     {
         if (!isFirstIcon || bombSet == null || bombSet.IsPlacementLocked()) return;
 
-        // ドロップした位置からゲーム画面に向かってレイキャストを飛ばし、設置を試みる
+        IsCurrentlyDragging = false;
+
+        // 判定を取る前に一度解除
+        if (bombSet.CurrentlyDraggingHandler == this)
+        {
+            bombSet.CurrentlyDraggingHandler = null;
+        }
+
         bool success = bombSet.TryPlaceFromDrag(eventData.position);
 
         if (success)
         {
-            // 設置成功したら、このドラッグ用UIは役目を終えたので消滅
             Destroy(gameObject);
         }
         else
         {
-            // 設置失敗（画面外や置けない場所）なら、元のUIの並び（Vertical Layout Group）に戻す
             transform.SetParent(originalParent);
+            transform.SetSiblingIndex(originalIndex);
             transform.position = originalPosition;
             canvasGroup.blocksRaycasts = true;
+
+            bombSet.RefreshStockUI();
         }
     }
 }

@@ -365,7 +365,7 @@ Transform:
   m_GameObject: {fileID: 4393129388843459943}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.21, y: 0.14, z: 0}
+  m_LocalPosition: {x: 0, y: 0.05, z: 0}
   m_LocalScale: {x: 0.065, y: 0.065, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -420,7 +420,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 2
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 4807533030513257241, guid: d7100f35d6e4b644f9ca0bb00bf38f15, type: 3}
+  m_Sprite: {fileID: -5492489309943875393, guid: 955d14f09a1340d4a926ac8f8bf91d65, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -642,7 +642,9 @@ MonoBehaviour:
   fadeInRatio: 0.2
   fadeOutRatio: 0.5
   uiSprite: {fileID: -1044015532666706457, guid: 4fd7de34cc5c5e541bee15cb197eef81, type: 3}
+  waitingUiSprite: {fileID: 0}
   upgradedUiSprite: {fileID: 4807533030513257241, guid: d7100f35d6e4b644f9ca0bb00bf38f15, type: 3}
+  upgradedWaitingUiSprite: {fileID: 0}
   spriteChildObject: {fileID: 4393129388843459943}
   upgradedInGameSprite: {fileID: 4807533030513257241, guid: d7100f35d6e4b644f9ca0bb00bf38f15, type: 3}
   baseDamage: 1
