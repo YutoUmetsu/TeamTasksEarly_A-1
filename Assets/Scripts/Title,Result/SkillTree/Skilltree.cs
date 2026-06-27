@@ -158,14 +158,15 @@ public class Skilltree : MonoBehaviour
 
     public void SaveSkill()//セーブ
     {
-        PlayerPrefs.SetInt(SkillName, UnlokkedSkill ? 1 : 0);
+        // 【修正】SkillNameではなく、オブジェクト固有の名前（gameObject.name）をキーにする
+        PlayerPrefs.SetInt(gameObject.name + "_Unlocked", UnlokkedSkill ? 1 : 0);
     }
 
     public void LoadSkill()//ロード
     {
-        UnlokkedSkill = PlayerPrefs.GetInt(SkillName, 0) == 1;
+        // 【修正】読み込み時もオブジェクト固有の名前で探す
+        UnlokkedSkill = PlayerPrefs.GetInt(gameObject.name + "_Unlocked", 0) == 1;
     }
-
     public void GetSkillCount()
     {
         SkillCount++;
