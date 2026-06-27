@@ -11,7 +11,7 @@ public class StageCoinUI : MonoBehaviour
         // 常にCoinManagerの総量を覗き見して、リアルタイムに表示を更新する
         if (stageTotalCoinText != null && CoinManager.Instance != null)
         {
-            stageTotalCoinText.text = CoinManager.Instance.TotalCoins.ToString();
+            stageTotalCoinText.text = CoinManager.Instance.AddCoins.ToString();
         }
     }
 }
