@@ -47,12 +47,15 @@ public class Controller : MonoBehaviour
         startPos = transform.position;
         bombSet = UnityEngine.Object.FindFirstObjectByType<BombSet>();
 
-        // ─── ★【追加：スキルツリーのボーナスを基本サイズに加算】───
+        // ─── ★【修正：加算後にMathf.Minで最大サイズを8に制限】───
         currentBoardSize = baseBoardSize;
         if (BoardSizeManager.Instance != null)
         {
             currentBoardSize += BoardSizeManager.Instance.bonusBoardSize;
         }
+
+        // どんなにスキルボーナスが乗っても、最終的なサイズは最大8にする
+        currentBoardSize = Mathf.Min(currentBoardSize, 8);
 
         GenerateBoard();
         ControllerUpdate = new Action[(int)GameState.Max];
@@ -122,7 +125,7 @@ public class Controller : MonoBehaviour
         yield return new WaitForFixedUpdate();
         yield return null;
 
-        float delay = 0.5f;
+        float delay = 0.6f;
         Bomb activeBomb = UnityEngine.Object.FindFirstObjectByType<Bomb>();
         if (activeBomb != null)
         {
@@ -308,7 +311,6 @@ public class Controller : MonoBehaviour
         isBoardSettledThisFrame = true;
     }
 
-    // ─── ★【5枚コイン対応 ＆ コインボーナススキル連動版】★ ───
     public void SpawnCoinImmediate(FallObject targetObj)
     {
         if (targetObj == null) return;
@@ -316,16 +318,13 @@ public class Controller : MonoBehaviour
         DestructibleBlock db = targetObj.GetComponent<DestructibleBlock>();
         if (db != null)
         {
-            // ベースの枚数を取得
             int totalAmount = db.coinRewardAmount;
 
-            // ★スキルによる追加コインボーナスを加算
             if (CoinBonusManager.Instance != null)
             {
                 totalAmount += CoinBonusManager.Instance.bonusCoinAmount;
             }
 
-            // CoinManager（データ側）に最終獲得枚数を一気に加算
             if (CoinManager.Instance != null)
             {
                 CoinManager.Instance.AddCoin(totalAmount);
@@ -334,7 +333,6 @@ public class Controller : MonoBehaviour
             int count5x = 0;
             int count1x = 0;
 
-            // 5枚コインのプレハブが設定されている場合のみ割り算
             if (db.coinVisualPrefab5x != null)
             {
                 count5x = totalAmount / 5;
@@ -345,13 +343,11 @@ public class Controller : MonoBehaviour
                 count1x = totalAmount;
             }
 
-            // 5枚コイン生成
             for (int i = 0; i < count5x; i++)
             {
                 CreateCoinObject(db.coinVisualPrefab5x, db);
             }
 
-            // 1枚コイン生成
             for (int i = 0; i < count1x; i++)
             {
                 if (db.coinVisualPrefab != null)
@@ -409,7 +405,7 @@ public class Controller : MonoBehaviour
 
         return fallPrefab;
     }
-    // コインが消えた時にカウントを減らす関数
+
     public void DecrementCoinCount()
     {
         activeCoinCount--;
